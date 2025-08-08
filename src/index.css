@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+  
+  .input-field {
+    @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:text-white;
+  }
+  
+  .card {
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6;
+  }
+
+  /* Estilos para navegação em abas */
+  .nav-tab {
+    @apply flex items-center px-4 py-3 text-sm font-medium border-b-2 border-transparent rounded-t-lg transition-all duration-200 whitespace-nowrap;
+  }
+  
+  .nav-tab-active {
+    @apply border-b-2 rounded-t-lg;
+  }
+  
+  .nav-tab-inactive {
+    @apply text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50;
+  }
+  
+  .nav-tab-disabled {
+    @apply text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-50;
+  }
+
+  /* Scrollbar personalizada para abas */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
