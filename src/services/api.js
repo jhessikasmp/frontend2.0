@@ -1,3 +1,5 @@
+// src/services/api.js
+
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
@@ -31,7 +33,6 @@ export const authService = {
   logout: () => {
     // Backend2 não usa tokens - apenas remove dados locais
     localStorage.removeItem('user');
-    // localStorage.removeItem('token'); // Comentado - não usa token
   },
 
   getCurrentUser: () => {
@@ -52,38 +53,9 @@ export const authService = {
 
 // Serviços de relatórios
 export const reportService = {
-  getAnnualReport: async (year) => {
-    const response = await api.get(`/reports/annual?year=${year}`);
-    return response.data;
-  },
-
-  getMonthlyReport: async (year, month) => {
-    const response = await api.get(`/reports/monthly/${year}/${month}`);
-    return response.data;
-  },
-
   getDashboardData: async () => {
-    try {
-      const response = await api.get('/reports/dashboard');
-      return response.data;
-    } catch (err) {
-      console.log('🔄 Endpoint /reports/dashboard não disponível, usando endpoints separados');
-      // Fallback - chamar endpoints separadamente se não existir
-      const [salaryResponse, expenseResponse] = await Promise.all([
-        api.get('/salary/summary'),
-        api.get('/expenses/summary')
-      ]);
-      
-      const totalSalary = salaryResponse.data.totalSalary || 0;
-      const monthlyExpenses = expenseResponse.data.totalExpenses || 0;
-      const balance = totalSalary - Math.abs(monthlyExpenses);
-      
-      return {
-        totalSalary,
-        monthlyExpenses,
-        balance
-      };
-    }
+    const response = await api.get('/reports/dashboard');
+    return response.data;
   },
 };
 
@@ -116,7 +88,6 @@ export const expenseService = {
     return response.data;
   },
 
-  // Resumo mensal de despesas
   getMonthlySummary: async () => {
     const response = await api.get('/expenses/summary');
     return response.data;
@@ -155,7 +126,6 @@ export const investmentService = {
     return response.data;
   },
 
-  // Criar investimento com transferência do salário
   createInvestmentWithSalaryTransfer: async (investmentData) => {
     const response = await api.post('/investments/salary-transfer', investmentData);
     return response.data;
@@ -194,7 +164,6 @@ export const fundService = {
     return response.data;
   },
 
-  // Adicionar entrada com transferência do salário
   addEntryWithSalaryTransfer: async (fundType, entryData) => {
     const response = await api.post(`/funds/${fundType}/entry/salary-transfer`, entryData);
     return response.data;
@@ -203,12 +172,8 @@ export const fundService = {
 
 // Serviços de salário
 export const salaryService = {
-  addSalary: async (amount, userId, name = 'Salário') => {
-    const response = await api.post('/salary/entries', { 
-      userId, 
-      name, 
-      amount
-    });
+  addSalary: async (amount, userId) => {
+    const response = await api.post('/salary', { amount, userId });
     return response.data;
   },
 
