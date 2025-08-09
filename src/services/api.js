@@ -10,41 +10,6 @@ const api = axios.create({
   },
 });
 
-// Backend2 não usa autenticação - interceptors comentados
-/*
-// Interceptador para adicionar token automaticamente
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    console.log('🟡 Requisição sem token (teste):', config.url);
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-*/
-
-// Backend2 não usa autenticação - interceptor de resposta comentado
-/*
-// Interceptador para lidar com respostas e erros
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token inválido ou expirado
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
-*/
-
 // Serviços de autenticação
 export const authService = {
   register: async (userData) => {
@@ -98,8 +63,27 @@ export const reportService = {
   },
 
   getDashboardData: async () => {
-    const response = await api.get('/reports/dashboard');
-    return response.data;
+    try {
+      const response = await api.get('/reports/dashboard');
+      return response.data;
+    } catch (err) {
+      console.log('🔄 Endpoint /reports/dashboard não disponível, usando endpoints separados');
+      // Fallback - chamar endpoints separadamente se não existir
+      const [salaryResponse, expenseResponse] = await Promise.all([
+        api.get('/salary/summary'),
+        api.get('/expenses/summary')
+      ]);
+      
+      const totalSalary = salaryResponse.data.totalSalary || 0;
+      const monthlyExpenses = expenseResponse.data.totalExpenses || 0;
+      const balance = totalSalary - Math.abs(monthlyExpenses);
+      
+      return {
+        totalSalary,
+        monthlyExpenses,
+        balance
+      };
+    }
   },
 };
 
@@ -129,6 +113,12 @@ export const expenseService = {
     console.log('🔄 Buscando despesas:', { month, year });
     const response = await api.get(`/expenses/monthly/${month}/${year}`);
     console.log('🔄 Resposta:', response.data);
+    return response.data;
+  },
+
+  // Resumo mensal de despesas
+  getMonthlySummary: async () => {
+    const response = await api.get('/expenses/summary');
     return response.data;
   },
 };
@@ -213,18 +203,22 @@ export const fundService = {
 
 // Serviços de salário
 export const salaryService = {
-  addSalary: async (amount, userId = 'default-user', name = 'Salário') => {
+  addSalary: async (amount, userId, name = 'Salário') => {
     const response = await api.post('/salary/entries', { 
       userId, 
       name, 
-      amount,
-      description: 'Entrada de salário'
+      amount
     });
     return response.data;
   },
 
-  getAvailableBalance: async (userId = 'default-user') => {
+  getAvailableBalance: async (userId) => {
     const response = await api.get(`/salary/summary?userId=${userId}`);
+    return response.data;
+  },
+
+  getMonthlySummary: async () => {
+    const response = await api.get('/salary/summary');
     return response.data;
   },
 
@@ -233,8 +227,39 @@ export const salaryService = {
     return response.data;
   },
 
-  getTransferHistory: async (userId = 'default-user') => {
+  getTransferHistory: async (userId) => {
     const response = await api.get(`/salary/history?userId=${userId}`);
+    return response.data;
+  },
+};
+
+// Serviços de lembretes
+export const reminderService = {
+  createReminder: async (userId, text) => {
+    console.log('📡 Criando lembrete:', { userId, text });
+    const response = await api.post('/reminders', { userId, text });
+    console.log('📡 Lembrete criado:', response.data);
+    return response.data;
+  },
+
+  getReminders: async (userId) => {
+    console.log('📡 Buscando lembretes para userId:', userId);
+    const response = await api.get(`/reminders?userId=${userId}`);
+    console.log('📡 Lembretes encontrados:', response.data);
+    return response.data;
+  },
+
+  updateReminder: async (id, text) => {
+    console.log('📡 Atualizando lembrete:', { id, text });
+    const response = await api.put(`/reminders/${id}`, { text });
+    console.log('📡 Lembrete atualizado:', response.data);
+    return response.data;
+  },
+
+  deleteReminder: async (id) => {
+    console.log('📡 Deletando lembrete:', id);
+    const response = await api.delete(`/reminders/${id}`);
+    console.log('📡 Lembrete deletado');
     return response.data;
   },
 };

@@ -4,32 +4,23 @@ import { useAuth } from '../context/AuthContext';
 import { UserPlus, User, CheckCircle, AlertCircle } from 'lucide-react';
 
 const Register = () => {
-  const [formData, setFormData] = useState({
-    username: '',
-  });
+  const [formData, setFormData] = useState({ username: '' });
   const [validationErrors, setValidationErrors] = useState({});
   const { register, loading, error } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-
-    // Limpar erro de validação específico quando o usuário começar a digitar
+    console.log('handleChange:', name, value);
+    setFormData({ ...formData, [name]: value });
     if (validationErrors[name]) {
-      setValidationErrors({
-        ...validationErrors,
-        [name]: '',
-      });
+      setValidationErrors({ ...validationErrors, [name]: '' });
     }
   };
 
   const validateForm = () => {
     const errors = {};
-
+    console.log('validateForm input:', formData.username);
     if (!formData.username.trim()) {
       errors.username = 'Nome de usuário é obrigatório';
     } else if (formData.username.length < 3) {
@@ -39,27 +30,28 @@ const Register = () => {
     } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
       errors.username = 'Nome de usuário só pode conter letras, números e underscore';
     }
-
+    console.log('validateForm errors:', errors);
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    console.log('handleSubmit start');
     if (!validateForm()) {
+      console.log('handleSubmit validation failed');
       return;
     }
 
-    console.log('🔄 Iniciando processo de registro...');
-    const result = await register(formData);
-    console.log('🔄 Resultado do registro:', result);
-    
+    console.log('handleSubmit calling register with name=', formData.username);
+    const result = await register({ name: formData.username });
+    console.log('handleSubmit register result:', result);
+
     if (result.success) {
-      console.log('✅ Registro bem-sucedido, redirecionando...');
+      console.log('handleSubmit success, navigate to dashboard');
       navigate('/dashboard');
     } else {
-      console.log('❌ Registro falhou:', result.error);
+      console.log('handleSubmit failure, error:', result.error);
       alert(`Erro no registro: ${result.error}`);
     }
   };
@@ -89,7 +81,10 @@ const Register = () => {
             )}
 
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Nome de usuário
               </label>
               <div className="relative">
@@ -102,8 +97,8 @@ const Register = () => {
                   type="text"
                   required
                   className={`input-field pl-10 ${
-                    validationErrors.username 
-                      ? 'border-red-300 dark:border-red-600 focus:ring-red-500' 
+                    validationErrors.username
+                      ? 'border-red-300 dark:border-red-600 focus:ring-red-500'
                       : formData.username && !validationErrors.username
                       ? 'border-green-300 dark:border-green-600 focus:ring-green-500'
                       : ''
@@ -161,7 +156,6 @@ const Register = () => {
           </form>
         </div>
 
-        {/* Recursos do sistema */}
         <div className="card">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             O que você pode fazer:
