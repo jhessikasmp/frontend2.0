@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
-import ProtectedRoute from './components/ProtectedRoute';
 import ApiTest from './components/ApiTest';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -17,95 +16,37 @@ import Reports from './pages/Reports';
 
 function App() {
   return (
-    <AuthProvider>
-      <ThemeProvider>
+    <ThemeProvider>
+      <AuthProvider>
         <Router>
-          <div className="App">
-            <Routes>
-            {/* Rota raiz - redireciona para dashboard se autenticado, senão para login */}
+          <Routes>
+            {/* Rota raiz - redireciona para dashboard */}
             <Route 
               path="/" 
               element={<Navigate to="/dashboard" replace />} 
             />
             
-            {/* Rotas públicas */}
+            {/* Rotas públicas (sem proteção) */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/debug" element={<ApiTest />} />
+            <Route path="/api-test" element={<ApiTest />} />
             
-            {/* Rotas protegidas */}
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/expenses"
-              element={
-                <ProtectedRoute>
-                  <Expenses />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/investments"
-              element={
-                <ProtectedRoute>
-                  <Investments />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/funds/emergencia"
-              element={
-                <ProtectedRoute>
-                  <EmergencyFund />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/funds/viagem"
-              element={
-                <ProtectedRoute>
-                  <TravelFund />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/funds/carro"
-              element={
-                <ProtectedRoute>
-                  <CarReserve />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/funds/mesada"
-              element={
-                <ProtectedRoute>
-                  <Allowance />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/reports"
-              element={
-                <ProtectedRoute>
-                  <Reports />
-                </ProtectedRoute>
-              }
-            />
+            {/* Rotas principais (sem proteção) */}
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/expenses" element={<Expenses />} />
+            <Route path="/investments" element={<Investments />} />
+            <Route path="/emergency-fund" element={<EmergencyFund />} />
+            <Route path="/travel-fund" element={<TravelFund />} />
+            <Route path="/car-reserve" element={<CarReserve />} />
+            <Route path="/allowance" element={<Allowance />} />
+            <Route path="/reports" element={<Reports />} />
             
             {/* Rota 404 - redireciona para dashboard */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
-          </div>
         </Router>
-      </ThemeProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

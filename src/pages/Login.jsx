@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import { Eye, EyeOff, LogIn, User } from 'lucide-react';
+import axios from 'axios';
 
 const Login = () => {
   const [formData, setFormData] = useState({
     username: '',
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const { login, loading, error } = useAuth();
+  const [showPassword, setShowPassword] = useState(false); // mantive pois estava no código, mesmo sem uso atual
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -18,25 +19,47 @@ const Login = () => {
     });
   };
 
+  const login = async ({ username }) => {
+    try {
+      // Chamada para o backend no endpoint /api/users/login, envia { name }
+      const response = await axios.post('http://localhost:5001/api/users/login', {
+        name: username.trim(),
+      });
+      return { success: true, data: response.data };
+    } catch (err) {
+      if (err.response) {
+        return { success: false, error: err.response.data.message || 'Erro no login' };
+      }
+      return { success: false, error: 'Erro na conexão com o servidor' };
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.username.trim()) {
       alert('Por favor, digite seu nome de usuário');
       return;
     }
 
+    setError('');
+    setLoading(true);
     console.log('🔄 Iniciando processo de login...');
     const result = await login(formData);
     console.log('🔄 Resultado do login:', result);
-    
+
     if (result.success) {
       console.log('✅ Login bem-sucedido, redirecionando...');
+      // Você pode salvar o usuário no contexto ou localStorage aqui, se quiser
+      // Exemplo: localStorage.setItem('user', JSON.stringify(result.data));
+
       navigate('/dashboard');
     } else {
       console.log('❌ Login falhou:', result.error);
+      setError(result.error);
       alert(`Erro no login: ${result.error}`);
     }
+    setLoading(false);
   };
 
   return (
@@ -63,7 +86,10 @@ const Login = () => {
             )}
 
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Nome de usuário
               </label>
               <div className="relative">
