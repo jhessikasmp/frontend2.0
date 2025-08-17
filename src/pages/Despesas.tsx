@@ -5,7 +5,18 @@ import { safeGetFromStorage } from '../utils/storage';
 
 
 const categorias = [
-	'Alimentação', 'Combustível', 'Aluguel', 'Saúde', 'Educação', 'Lazer', 'Boleto', 'Doação', 'Internet', 'Streaming', 'Telefone', 'Outros'
+	'Supermercado',
+	'Aluguel',
+	'Combustível',
+	'Boletos',
+	'Saúde',
+	'Educação',
+	'Lazer',
+	'Doação',
+	'Internet',
+	'Streaming',
+	'Telefone',
+	'Outros'
 ];
 
 interface Despesa {
