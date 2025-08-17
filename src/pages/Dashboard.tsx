@@ -39,8 +39,6 @@ const Dashboard: React.FC = () => {
   const [expenseTotal, setExpenseTotal] = useState<number | null>(null);
   const [expenseLoading, setExpenseLoading] = useState(false);
   const [userExpenseLoading, setUserExpenseLoading] = useState(false);
-  const [userExpenseTotal, setUserExpenseTotal] = useState<number | null>(null);
-  const [salary, setSalary] = useState<number | null>(null);
   // --- Lembretes ---
   const [reminders, setReminders] = useState<any[]>([]);
   const [reminderLoading, setReminderLoading] = useState(false);

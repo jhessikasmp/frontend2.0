@@ -17,7 +17,6 @@ const cardGradients = [
 ];
 
 const Investimento: React.FC = () => {
-		const [entradasAno, setEntradasAno] = useState(0);
 		const [entradasAnoEuro, setEntradasAnoEuro] = useState(0);
 		const [totalAtivosEuro, setTotalAtivosEuro] = useState(0);
 		const [entradaValor, setEntradaValor] = useState('');
