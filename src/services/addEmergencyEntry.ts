@@ -1,5 +1,5 @@
 export async function addEmergencyEntry(userId: string, valor: number) {
-  const res = await fetch('http://localhost:5000/api/emergency-entry', {
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/emergency-entry`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ user: userId, valor, data: new Date() })
