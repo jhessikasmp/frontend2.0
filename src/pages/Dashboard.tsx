@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 
 import { FaMoneyBillWave, FaWallet, FaPiggyBank, FaUserCircle, FaBell, FaBars } from 'react-icons/fa';
-import { toEuro } from '../utils/currency';
 import { safeGetFromStorage } from '../utils/storage';
 
 const Dashboard: React.FC = () => {
@@ -29,10 +28,8 @@ const Dashboard: React.FC = () => {
     return false;
   });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [salary, setSalary] = useState<number | null>(null);
   const [salaryTotal, setSalaryTotal] = useState<number | null>(null);
   const [salaryLoading, setSalaryLoading] = useState(false);
-  const [salaryEdit, setSalaryEdit] = useState(false);
   const [salaryInput, setSalaryInput] = useState('');
   const [salaryDate, setSalaryDate] = useState(() => {
     const now = new Date();
@@ -41,8 +38,9 @@ const Dashboard: React.FC = () => {
   const [showSalaryForm, setShowSalaryForm] = useState(false);
   const [expenseTotal, setExpenseTotal] = useState<number | null>(null);
   const [expenseLoading, setExpenseLoading] = useState(false);
-  const [userExpenseTotal, setUserExpenseTotal] = useState<number | null>(null);
   const [userExpenseLoading, setUserExpenseLoading] = useState(false);
+  const [userExpenseTotal, setUserExpenseTotal] = useState<number | null>(null);
+  const [salary, setSalary] = useState<number | null>(null);
   // --- Lembretes ---
   const [reminders, setReminders] = useState<any[]>([]);
   const [reminderLoading, setReminderLoading] = useState(false);
@@ -52,15 +50,11 @@ const Dashboard: React.FC = () => {
   const [reminderDate, setReminderDate] = useState('');
 
   // Buscar lembretes do usuário ao carregar
-  useEffect(() => {
-    fetchAllReminders();
-  }, []);
-
-  // Buscar todos os lembretes de todos os usuários
+  // Função correta para buscar todos os lembretes
   const fetchAllReminders = async () => {
     setReminderLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/reminder/all');
+      const res = await fetch('http://localhost:5000/api/reminder');
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
         setReminders(data.data);
@@ -73,6 +67,10 @@ const Dashboard: React.FC = () => {
       setReminderLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchAllReminders();
+  }, []);
 
   const handleSaveReminder = async () => {
     if (!currentUser || !reminderTitle) return;

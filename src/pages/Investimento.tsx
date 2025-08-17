@@ -17,33 +17,29 @@ const cardGradients = [
 ];
 
 const Investimento: React.FC = () => {
-	const [entradasAno, setEntradasAno] = useState(0);
-	const [entradasAnoEuro, setEntradasAnoEuro] = useState(0);
-	const [totalAtivosEuro, setTotalAtivosEuro] = useState(0);
-	const [totalBRL, setTotalBRL] = useState(0);
-	const [totalUSD, setTotalUSD] = useState(0);
-	const [totalEUR, setTotalEUR] = useState(0);
-	const [entradaValor, setEntradaValor] = useState('');
-	const [entradaMoeda] = useState('Euro');
-	const [ativoNome, setAtivoNome] = useState('');
-	const [ativoValor, setAtivoValor] = useState('');
-	const [ativoTipo, setAtivoTipo] = useState('');
-	const [ativoMoeda, setAtivoMoeda] = useState('');
-	const [ativoData, setAtivoData] = useState('');
-	const [ativos, setAtivos] = useState<any[]>([]);
-	const userId = (() => {
-		try {
-			const raw = localStorage.getItem('currentUser');
-			if (!raw) return null;
-			if (raw.startsWith('{')) {
-				return JSON.parse(raw)._id;
+		const [entradasAno, setEntradasAno] = useState(0);
+		const [entradasAnoEuro, setEntradasAnoEuro] = useState(0);
+		const [totalAtivosEuro, setTotalAtivosEuro] = useState(0);
+		const [entradaValor, setEntradaValor] = useState('');
+		const [ativoNome, setAtivoNome] = useState('');
+		const [ativoValor, setAtivoValor] = useState('');
+		const [ativoTipo, setAtivoTipo] = useState('');
+		const [ativoMoeda, setAtivoMoeda] = useState('');
+		const [ativoData, setAtivoData] = useState('');
+		const [ativos, setAtivos] = useState<any[]>([]);
+		const userId = (() => {
+			try {
+				const raw = localStorage.getItem('currentUser');
+				if (!raw) return null;
+				if (raw.startsWith('{')) {
+					return JSON.parse(raw)._id;
+				}
+				return raw;
+			} catch {
+				return null;
 			}
-			return raw;
-		} catch {
-			return null;
-		}
-	})();
-	const [showEntradaForm, setShowEntradaForm] = useState(false);
+		})();
+		const [showEntradaForm, setShowEntradaForm] = useState(false);
 
 		const atualizarDados = () => {
 			const year = new Date().getFullYear();
@@ -63,9 +59,6 @@ const Investimento: React.FC = () => {
 					else if (inv.moeda === 'Dolar') usd += inv.valor;
 					else if (inv.moeda === 'Euro') eur += inv.valor;
 				});
-				setTotalBRL(brl);
-				setTotalUSD(usd);
-				setTotalEUR(eur);
 				const totalEuro = investments.reduce((sum: number, inv: any) => sum + toEuro(inv.valor, inv.moeda), 0);
 				setTotalAtivosEuro(totalEuro);
 			});
