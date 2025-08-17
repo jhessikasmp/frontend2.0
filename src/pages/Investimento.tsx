@@ -43,12 +43,10 @@ const Investimento: React.FC = () => {
 		const atualizarDados = () => {
 			const year = new Date().getFullYear();
 			if (userId) {
-				getInvestmentEntriesYear(userId, year).then(entries => {
-					const total = entries.reduce((sum: number, e: any) => sum + (e.value || 0), 0);
-					setEntradasAno(total);
-					const totalEuro = entries.reduce((sum: number, e: any) => sum + toEuro(e.value, e.moeda), 0);
-					setEntradasAnoEuro(totalEuro);
-				});
+						getInvestmentEntriesYear(userId, year).then(entries => {
+						const totalEuro = entries.reduce((sum: number, e: any) => sum + toEuro(e.value, e.moeda), 0);
+						setEntradasAnoEuro(totalEuro);
+						});
 			}
 			getAllInvestments().then(investments => {
 				setAtivos(investments);

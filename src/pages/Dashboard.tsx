@@ -127,14 +127,9 @@ const Dashboard: React.FC = () => {
     try {
       const res = await fetch(`http://localhost:5000/api/expense/user/${userId}`);
       const data = await res.json();
-      if (data.success && Array.isArray(data.data)) {
-        const total = data.data.reduce((sum: number, exp: any) => sum + (exp.value || 0), 0);
-        setUserExpenseTotal(total);
-      } else {
-        setUserExpenseTotal(null);
-      }
+  // ...existing code...
     } catch (e) {
-      setUserExpenseTotal(null);
+      // ...existing code...
     } finally {
       setUserExpenseLoading(false);
     }
@@ -190,20 +185,8 @@ const Dashboard: React.FC = () => {
     try {
       const res = await fetch(`http://localhost:5000/api/salary/user/${userId}`);
       const data = await res.json();
-      if (data.success && data.data) {
-        setSalary(data.data.value);
-        // Só atualiza o input se a data for do mês atual
-        const now = new Date();
-        const salaryDate = new Date(data.data.date);
-        if (salaryDate.getMonth() === now.getMonth() && salaryDate.getFullYear() === now.getFullYear()) {
-          setSalaryInput(data.data.value.toString());
-        }
-      } else {
-        setSalary(null);
-        setSalaryInput('');
-      }
+  // ...existing code...
     } catch (e) {
-      setSalary(null);
       setSalaryInput('');
     }
   };
@@ -219,16 +202,11 @@ const Dashboard: React.FC = () => {
       });
       const data = await res.json();
       // Só atualiza o card se o salário adicionado for do mês atual
-      if (data.success && data.data) {
-        const now = new Date();
-        const salaryDate = new Date(data.data.date);
-        if (salaryDate.getMonth() === now.getMonth() && salaryDate.getFullYear() === now.getFullYear()) {
-          setSalary(data.data.value);
-        }
-        // Limpa os campos após adicionar
-        setSalaryInput('');
-        setSalaryDate(now.toISOString().slice(0, 10));
-      }
+      const now = new Date();
+      const salaryDateObj = new Date(data.data?.date);
+      // Limpa os campos após adicionar
+      setSalaryInput('');
+      setSalaryDate(now.toISOString().slice(0, 10));
     } catch (e) {}
     setSalaryLoading(false);
   };
