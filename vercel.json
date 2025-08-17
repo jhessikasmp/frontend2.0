@@ -1,9 +1,6 @@
 {
-  "builds": [
-    { "src": "vite.config.ts", "use": "@vercel/node" }
-  ],
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "http://localhost:5000/api/$1" }
+    { "source": "/api/(.*)", "destination": "https://jsfinanceapp.onrender.com/api/$1" }
   ],
   "outputDirectory": "dist"
 }
