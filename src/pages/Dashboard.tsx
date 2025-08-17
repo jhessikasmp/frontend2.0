@@ -51,7 +51,12 @@ const Dashboard: React.FC = () => {
   const fetchAllReminders = async () => {
     setReminderLoading(true);
     try {
-  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reminder`);
+      if (!currentUser || !currentUser._id) {
+        setReminders([]);
+        setReminderLoading(false);
+        return;
+      }
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reminder/user/${currentUser._id}`);
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
         setReminders(data.data);
