@@ -22,7 +22,7 @@ const Login: React.FC = () => {
       if (data.success) {
         const user = data.data.find((u: any) => u.name.trim().toLowerCase() === name.trim().toLowerCase());
         if (user) {
-          localStorage.setItem('currentUser', user._id);
+          localStorage.setItem('currentUser', JSON.stringify(user));
           navigate('/dashboard');
         } else {
           setError('Usuário não encontrado');

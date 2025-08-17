@@ -1,6 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { FaWallet } from 'react-icons/fa';
+import { safeGetFromStorage } from '../utils/storage';
+
 
 const categorias = [
 	'Alimentação', 'Combustível', 'Aluguel', 'Saúde', 'Educação', 'Lazer', 'Boleto', 'Doação', 'Internet', 'Streaming', 'Telefone', 'Outros'
@@ -90,7 +92,8 @@ const Despesas: React.FC = () => {
 		}
 		setLoading(true);
 		try {
-			const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+			const currentUser = safeGetFromStorage('currentUser', {});
+			
 			let res;
 			try {
 				res = await fetch('/api/expense', {
