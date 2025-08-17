@@ -31,7 +31,18 @@ const Investimento: React.FC = () => {
 	const [ativoMoeda, setAtivoMoeda] = useState('');
 	const [ativoData, setAtivoData] = useState('');
 	const [ativos, setAtivos] = useState<any[]>([]);
-	const userId = localStorage.getItem('currentUser');
+	const userId = (() => {
+		try {
+			const raw = localStorage.getItem('currentUser');
+			if (!raw) return null;
+			if (raw.startsWith('{')) {
+				return JSON.parse(raw)._id;
+			}
+			return raw;
+		} catch {
+			return null;
+		}
+	})();
 	const [showEntradaForm, setShowEntradaForm] = useState(false);
 
 		const atualizarDados = () => {
@@ -71,6 +82,8 @@ const Investimento: React.FC = () => {
 		await addInvestmentEntry(userId, Number(entradaValor), 'Euro');
 		setEntradaValor('');
 		atualizarDados();
+	// Atualiza histórico de investimentos
+	getAllInvestments().then(investments => setAtivos(investments));
 	};
 		const handleAddAtivo = async (e: React.FormEvent) => {
 			e.preventDefault();
@@ -89,6 +102,8 @@ const Investimento: React.FC = () => {
 			setAtivoMoeda('');
 			setAtivoData('');
 			atualizarDados();
+	// Atualiza histórico de investimentos
+	getAllInvestments().then(investments => setAtivos(investments));
 		};
 			return (
 				<main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">

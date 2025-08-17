@@ -197,8 +197,17 @@ const Despesas: React.FC = () => {
 							const now = new Date();
 							const m = now.getMonth();
 							const y = now.getFullYear();
-							const dateObj = new Date(d.data);
-							return dateObj.getMonth() === m && dateObj.getFullYear() === y;
+							// Garante que d.data está em formato ISO ou Date
+							let dateObj;
+							if (typeof d.data === 'string' && d.data.length === 10 && d.data.includes('-')) {
+								// yyyy-mm-dd
+								const [year, month] = d.data.split('-');
+								dateObj = { year: Number(year), month: Number(month) - 1 };
+							} else {
+								const jsDate = new Date(d.data);
+								dateObj = { year: jsDate.getFullYear(), month: jsDate.getMonth() };
+							}
+							return dateObj.year === y && dateObj.month === m;
 						}).length === 0 && (
 							<div className="text-gray-500 text-sm text-center">Nenhuma despesa lançada neste mês</div>
 						)}
@@ -207,8 +216,15 @@ const Despesas: React.FC = () => {
 								const now = new Date();
 								const m = now.getMonth();
 								const y = now.getFullYear();
-								const dateObj = new Date(d.data);
-								return dateObj.getMonth() === m && dateObj.getFullYear() === y;
+								let dateObj;
+								if (typeof d.data === 'string' && d.data.length === 10 && d.data.includes('-')) {
+									const [year, month] = d.data.split('-');
+									dateObj = { year: Number(year), month: Number(month) - 1 };
+								} else {
+									const jsDate = new Date(d.data);
+									dateObj = { year: jsDate.getFullYear(), month: jsDate.getMonth() };
+								}
+								return dateObj.year === y && dateObj.month === m;
 							}).map((d, i) => (
 								<li key={i} className="bg-gray-50 dark:bg-gray-700 rounded p-3 flex justify-between items-center">
 									<div>

@@ -12,7 +12,18 @@ const Carro: React.FC = () => {
 		const [despesaValor, setDespesaValor] = useState('');
 		const [despesaData, setDespesaData] = useState('');
 		const [despesas, setDespesas] = useState<any[]>([]);
-	const userId = localStorage.getItem('currentUser');
+	const userId = (() => {
+	try {
+		const raw = localStorage.getItem('currentUser');
+		if (!raw) return null;
+		if (raw.startsWith('{')) {
+			return JSON.parse(raw)._id;
+		}
+		return raw;
+	} catch {
+		return null;
+	}
+})();
 	const [showEntradaForm, setShowEntradaForm] = useState(false);
 
 	useEffect(() => {
@@ -90,6 +101,10 @@ const Carro: React.FC = () => {
 						getCarroExpensesTotal(userId).then((total: number) => {
 							setTotalDespesas(total);
 						});
+								// Atualiza histórico de despesas
+								import('../services/getCarroExpenses').then(({ getCarroExpenses }) => {
+									getCarroExpenses(userId).then(arr => setDespesas(arr));
+								});
 					}}>
 						<h2 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">Adicionar Entrada (Aporte)</h2>
 						<input type="number" placeholder="Valor da Entrada (em Euro)" className="input w-full" value={entradaValor} onChange={e => setEntradaValor(e.target.value)} min={0} step={0.01} required />
@@ -123,6 +138,10 @@ const Carro: React.FC = () => {
 							setDespesaNome('');
 							setDespesaValor('');
 							setDespesaData('');
+								// Atualiza histórico de despesas
+								import('../services/getCarroExpenses').then(({ getCarroExpenses }) => {
+									getCarroExpenses(userId).then(arr => setDespesas(arr));
+								});
 						}}>
 							<input type="text" placeholder="Nome da Despesa" className="input w-full" value={despesaNome} onChange={e => setDespesaNome(e.target.value)} required />
 							<input type="number" placeholder="Valor (em Euro)" className="input w-full" min={0} step={0.01} value={despesaValor} onChange={e => setDespesaValor(e.target.value)} required />

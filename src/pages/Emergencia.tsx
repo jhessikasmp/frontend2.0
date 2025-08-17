@@ -9,7 +9,18 @@ const Emergencia: React.FC = () => {
 	const [saldoFundo, setSaldoFundo] = useState(0);
 	const [entradaValor, setEntradaValor] = useState('');
 	const [despesas, setDespesas] = useState<any[]>([]);
-	const userId = localStorage.getItem('currentUser');
+	const userId = (() => {
+	try {
+		const raw = localStorage.getItem('currentUser');
+		if (!raw) return null;
+		if (raw.startsWith('{')) {
+			return JSON.parse(raw)._id;
+		}
+		return raw;
+	} catch {
+		return null;
+	}
+})();
 	const [showEntradaForm, setShowEntradaForm] = useState(false);
 
 		useEffect(() => {
@@ -89,6 +100,10 @@ const Emergencia: React.FC = () => {
 													getEmergencyExpensesTotal(userId).then(total => {
 														setTotalDespesas(total);
 													});
+								// Atualiza histórico de despesas
+								import('../services/getEmergencyExpenses').then(({ getEmergencyExpenses }) => {
+									getEmergencyExpenses(userId).then(arr => setDespesas(arr));
+								});
 												}}>
 													<input type="number" placeholder="Valor da Entrada (em Euro)" className="input w-full" value={entradaValor} onChange={e => setEntradaValor(e.target.value)} min={0} step={0.01} required />
 													<div className="flex gap-4 mt-2">
@@ -125,6 +140,10 @@ const Emergencia: React.FC = () => {
 								(e.currentTarget.elements[0] as HTMLInputElement).value = '';
 								(e.currentTarget.elements[1] as HTMLInputElement).value = '';
 								(e.currentTarget.elements[2] as HTMLInputElement).value = '';
+								// Atualiza histórico de despesas
+								import('../services/getEmergencyExpenses').then(({ getEmergencyExpenses }) => {
+									getEmergencyExpenses(userId).then(arr => setDespesas(arr));
+								});
 							}}>
 								<input type="text" placeholder="Nome da Despesa" className="input w-full" required />
 								<input type="number" placeholder="Valor (em Euro)" className="input w-full" min={0} step={0.01} required />

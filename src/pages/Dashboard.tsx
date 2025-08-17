@@ -3,6 +3,7 @@ import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 
 import { FaMoneyBillWave, FaWallet, FaPiggyBank, FaUserCircle, FaBell, FaBars } from 'react-icons/fa';
 import { toEuro } from '../utils/currency';
+import { safeGetFromStorage } from '../utils/storage';
 
 const Dashboard: React.FC = () => {
   const location = useLocation();
@@ -52,8 +53,8 @@ const Dashboard: React.FC = () => {
 
   // Buscar lembretes do usuário ao carregar
   useEffect(() => {
-      fetchAllReminders();
-    }, []);
+    fetchAllReminders();
+  }, []);
 
   // Buscar todos os lembretes de todos os usuários
   const fetchAllReminders = async () => {
@@ -113,11 +114,12 @@ const Dashboard: React.FC = () => {
   const handleDeleteReminder = async (id: string) => {
     setReminderLoading(true);
     try {
-  await fetch(`http://localhost:5000/api/reminder/${id}`, { method: 'DELETE' });
-  fetchAllReminders();
+      await fetch(`http://localhost:5000/api/reminder/${id}`, { method: 'DELETE' });
+      fetchAllReminders();
     } catch (e) {}
     setReminderLoading(false);
   };
+
   useEffect(() => {
     if (currentUser && currentUser._id) {
       fetchUserExpenseTotal(currentUser._id);
@@ -245,7 +247,10 @@ const Dashboard: React.FC = () => {
   }, [dark]);
 
   useEffect(() => {
-    const userId = localStorage.getItem('currentUser');
+    // Corrigido:usar safeGetFromStorage e extrair só o _id para evitar problemas na URL
+    const stored = safeGetFromStorage('currentUser', null);
+    const userId: string | null = typeof stored === 'string' ? stored : stored && stored._id ? stored._id : null;
+
     if (!userId) {
       window.location.href = '/login';
       return;
@@ -271,10 +276,10 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-  <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       {/* Header */}
-  <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 w-full">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center mb-4">
+      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center mb-4">
           <div className="flex items-center">
             <button className="md:hidden mr-3" onClick={() => setMobileMenuOpen(true)} aria-label="Abrir menu">
               <FaBars className="h-6 w-6 text-gray-700 dark:text-gray-200" />
@@ -317,7 +322,8 @@ const Dashboard: React.FC = () => {
                   key={tab.path}
                   onClick={() => { setMobileMenuOpen(false); navigate(tab.path); }}
                   className={`w-full text-left px-6 py-4 text-base font-medium border-b border-gray-200 dark:border-gray-700 focus:outline-none transition-colors
-                    ${location.pathname === tab.path ? 'bg-primary-600 text-white dark:bg-primary-700' : 'text-gray-700 dark:text-gray-200 hover:bg-primary-100 dark:hover:bg-primary-900'}`}
+                    ${location.pathname === tab.path ? 'bg-primary-600 text-white dark:bg-primary-700' : 'text-gray-700 dark:text-gray-200 hover:bg-primary-100 dark:hover:bg-primary-900'}`
+                  }
                 >
                   <span className="text-xl mr-2">{tab.icon}</span>
                   {tab.label}
@@ -330,7 +336,7 @@ const Dashboard: React.FC = () => {
       )}
 
       {/* Navegação em abas (desktop) */}
-  <nav className="hidden md:block bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+      <nav className="hidden md:block bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-1 overflow-x-auto scrollbar-hide">
             {tabs.map(tab => (
@@ -338,7 +344,8 @@ const Dashboard: React.FC = () => {
                 key={tab.path}
                 onClick={() => navigate(tab.path)}
                 className={`flex items-center px-4 py-3 text-sm font-medium whitespace-nowrap transition-all duration-200 rounded-t-lg
-                  ${location.pathname === tab.path ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900 border-b-2 border-primary-600 dark:border-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 border-b-2 border-transparent hover:border-primary-300 dark:hover:border-primary-700'}`}
+                  ${location.pathname === tab.path ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900 border-b-2 border-primary-600 dark:border-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 border-b-2 border-transparent hover:border-primary-300 dark:hover:border-primary-700'}`
+                }
               >
                 <span className="text-lg mr-2">{tab.icon}</span>
                 {tab.label}
@@ -349,7 +356,7 @@ const Dashboard: React.FC = () => {
       </nav>
 
       {location.pathname === '/dashboard' ? (
-  <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+        <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
           {/* Cards principais */}
           {/* Botão para mostrar formulário de salário */}
           <div className="mb-6 w-full flex flex-row items-center">
