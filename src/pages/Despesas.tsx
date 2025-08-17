@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+const apiUrl = import.meta.env.VITE_API_URL;
 import { FaWallet } from 'react-icons/fa';
 import { safeGetFromStorage } from '../utils/storage';
 
@@ -41,7 +42,7 @@ const Despesas: React.FC = () => {
 
 	const fetchAllDespesas = async () => {
 		try {
-			const res = await fetch('/api/expense/all');
+			const res = await fetch(`${apiUrl}/api/expense/all`);
 			const data = await res.json();
 			if (data.success && Array.isArray(data.data)) {
 				const despesasArr = data.data.map((d: any): Despesa => ({
@@ -107,7 +108,7 @@ const Despesas: React.FC = () => {
 			
 			let res;
 			try {
-				res = await fetch('/api/expense', {
+				res = await fetch(`${apiUrl}/api/expense`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({

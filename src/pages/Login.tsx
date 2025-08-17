@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+const apiUrl = import.meta.env.VITE_API_URL;
 import { Link, useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
@@ -17,7 +18,7 @@ const Login: React.FC = () => {
     }
     setLoading(true);
     try {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users`);
+  const response = await fetch(`${apiUrl}/api/users`);
       const data = await response.json();
       if (data.success) {
         const user = data.data.find((u: any) => u.name.trim().toLowerCase() === name.trim().toLowerCase());

@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 
 import { FaMoneyBillWave, FaWallet, FaPiggyBank, FaUserCircle, FaBell, FaBars } from 'react-icons/fa';
+
 import { safeGetFromStorage } from '../utils/storage';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const Dashboard: React.FC = () => {
   const location = useLocation();
@@ -56,7 +58,7 @@ const Dashboard: React.FC = () => {
         setReminderLoading(false);
         return;
       }
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reminder/user/${currentUser._id}`);
+      const res = await fetch(`${apiUrl}/api/reminder/user/${currentUser._id}`);
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
         setReminders(data.data);
@@ -83,9 +85,9 @@ const Dashboard: React.FC = () => {
     try {
       const method = reminderEditId ? 'PUT' : 'POST';
       const url = reminderEditId
-        ? `${import.meta.env.VITE_API_URL}/api/reminder/${reminderEditId}`
-        : `${import.meta.env.VITE_API_URL}/api/reminder`;
-      const res = await fetch(url, {
+  ? `${apiUrl}/api/reminder/${reminderEditId}`
+  : `${apiUrl}/api/reminder`;
+  const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -117,7 +119,7 @@ const Dashboard: React.FC = () => {
   const handleDeleteReminder = async (id: string) => {
     setReminderLoading(true);
     try {
-  await fetch(`${import.meta.env.VITE_API_URL}/api/reminder/${id}`, { method: 'DELETE' });
+  await fetch(`${apiUrl}/api/reminder/${id}`, { method: 'DELETE' });
       fetchAllReminders();
     } catch (e) {}
     setReminderLoading(false);
@@ -131,7 +133,7 @@ const Dashboard: React.FC = () => {
 
   const fetchUserExpenseTotal = async (userId: string) => {
     try {
-  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/expense/user/${userId}`);
+  const res = await fetch(`${apiUrl}/api/expense/user/${userId}`);
       await res.json();
       // ...existing code...
     } catch (e) {
@@ -148,7 +150,7 @@ const Dashboard: React.FC = () => {
   const fetchExpenseTotal = async () => {
     setExpenseLoading(true);
     try {
-  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/expense/current-month-total`);
+  const res = await fetch(`${apiUrl}/api/expense/current-month-total`);
       const data = await res.json();
       if (data.success) {
         setExpenseTotal(data.total);
@@ -173,7 +175,7 @@ const Dashboard: React.FC = () => {
   const fetchSalaryTotal = async () => {
     setSalaryLoading(true);
     try {
-  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/salary/current-month-total`);
+  const res = await fetch(`${apiUrl}/api/salary/current-month-total`);
       const data = await res.json();
       if (data.success) {
         setSalaryTotal(data.total);
@@ -189,7 +191,7 @@ const Dashboard: React.FC = () => {
 
   const fetchUserSalary = async (userId: string) => {
     try {
-  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/salary/user/${userId}`);
+  const res = await fetch(`${apiUrl}/api/salary/user/${userId}`);
   await res.json();
   // ...existing code...
     } catch (e) {
@@ -201,7 +203,7 @@ const Dashboard: React.FC = () => {
     if (!currentUser || !salaryInput || !salaryDate) return;
     setSalaryLoading(true);
     try {
-  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/salary/user`, {
+  const res = await fetch(`${apiUrl}/api/salary/user`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user: currentUser._id, value: Number(salaryInput), date: salaryDate })
@@ -240,7 +242,7 @@ const Dashboard: React.FC = () => {
 
   const fetchCurrentUser = async (userId: string) => {
     try {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}`);
+  const response = await fetch(`${apiUrl}/api/users/${userId}`);
       const data = await response.json();
       if (data.success) {
         setCurrentUser(data.data);

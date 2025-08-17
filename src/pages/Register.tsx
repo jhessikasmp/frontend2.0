@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+const apiUrl = import.meta.env.VITE_API_URL;
 import { Link } from 'react-router-dom';
 
 const Register: React.FC = () => {
@@ -17,7 +18,7 @@ const Register: React.FC = () => {
     setLoading(true);
     
     try {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
+  const response = await fetch(`${apiUrl}/api/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
