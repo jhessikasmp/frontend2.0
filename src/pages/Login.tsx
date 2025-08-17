@@ -17,7 +17,7 @@ const Login: React.FC = () => {
     }
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/users`);
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users`);
       const data = await response.json();
       if (data.success) {
         const user = data.data.find((u: any) => u.name.trim().toLowerCase() === name.trim().toLowerCase());

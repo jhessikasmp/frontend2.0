@@ -51,7 +51,7 @@ const Dashboard: React.FC = () => {
   const fetchAllReminders = async () => {
     setReminderLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/reminder');
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reminder`);
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
         setReminders(data.data);
@@ -75,8 +75,8 @@ const Dashboard: React.FC = () => {
     try {
       const method = reminderEditId ? 'PUT' : 'POST';
       const url = reminderEditId
-        ? `http://localhost:5000/api/reminder/${reminderEditId}`
-        : 'http://localhost:5000/api/reminder';
+        ? `${import.meta.env.VITE_API_URL}/api/reminder/${reminderEditId}`
+        : `${import.meta.env.VITE_API_URL}/api/reminder`;
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -109,7 +109,7 @@ const Dashboard: React.FC = () => {
   const handleDeleteReminder = async (id: string) => {
     setReminderLoading(true);
     try {
-      await fetch(`http://localhost:5000/api/reminder/${id}`, { method: 'DELETE' });
+  await fetch(`${import.meta.env.VITE_API_URL}/api/reminder/${id}`, { method: 'DELETE' });
       fetchAllReminders();
     } catch (e) {}
     setReminderLoading(false);
@@ -123,7 +123,7 @@ const Dashboard: React.FC = () => {
 
   const fetchUserExpenseTotal = async (userId: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/expense/user/${userId}`);
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/expense/user/${userId}`);
       await res.json();
       // ...existing code...
     } catch (e) {
@@ -140,7 +140,7 @@ const Dashboard: React.FC = () => {
   const fetchExpenseTotal = async () => {
     setExpenseLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/expense/current-month-total');
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/expense/current-month-total`);
       const data = await res.json();
       if (data.success) {
         setExpenseTotal(data.total);
@@ -165,7 +165,7 @@ const Dashboard: React.FC = () => {
   const fetchSalaryTotal = async () => {
     setSalaryLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/salary/current-month-total');
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/salary/current-month-total`);
       const data = await res.json();
       if (data.success) {
         setSalaryTotal(data.total);
@@ -181,7 +181,7 @@ const Dashboard: React.FC = () => {
 
   const fetchUserSalary = async (userId: string) => {
     try {
-  const res = await fetch(`http://localhost:5000/api/salary/user/${userId}`);
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/salary/user/${userId}`);
   await res.json();
   // ...existing code...
     } catch (e) {
@@ -193,7 +193,7 @@ const Dashboard: React.FC = () => {
     if (!currentUser || !salaryInput || !salaryDate) return;
     setSalaryLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/salary/user', {
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/salary/user`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user: currentUser._id, value: Number(salaryInput), date: salaryDate })
@@ -232,7 +232,7 @@ const Dashboard: React.FC = () => {
 
   const fetchCurrentUser = async (userId: string) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/users/${userId}`);
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}`);
       const data = await response.json();
       if (data.success) {
         setCurrentUser(data.data);
