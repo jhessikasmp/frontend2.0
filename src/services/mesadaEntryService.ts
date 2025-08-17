@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 export async function getMesadaEntriesYear(userId: string, year: number) {
-  const res = await axios.get(`/api/mesada-entry/year/${userId}/${year}`);
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const res = await axios.get(`${apiUrl}/api/mesada-entry/year/${userId}/${year}`);
   return res.data.data || [];
 }
 
