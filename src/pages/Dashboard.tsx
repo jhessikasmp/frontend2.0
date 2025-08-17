@@ -53,12 +53,7 @@ const Dashboard: React.FC = () => {
   const fetchAllReminders = async () => {
     setReminderLoading(true);
     try {
-      if (!currentUser || !currentUser._id) {
-        setReminders([]);
-        setReminderLoading(false);
-        return;
-      }
-      const res = await fetch(`${apiUrl}/api/reminder/user/${currentUser._id}`);
+      const res = await fetch(`${apiUrl}/api/reminder/all`);
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
         setReminders(data.data);
@@ -73,11 +68,9 @@ const Dashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    // Só busca lembretes quando currentUser estiver carregado
-    if (currentUser && currentUser._id) {
-      fetchAllReminders();
-    }
-  }, [currentUser]);
+    // Busca lembretes globais ao carregar Dashboard
+    fetchAllReminders();
+  }, []);
 
   const handleSaveReminder = async () => {
     if (!currentUser || !reminderTitle) return;
