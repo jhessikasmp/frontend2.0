@@ -38,7 +38,6 @@ const Dashboard: React.FC = () => {
   const [showSalaryForm, setShowSalaryForm] = useState(false);
   const [expenseTotal, setExpenseTotal] = useState<number | null>(null);
   const [expenseLoading, setExpenseLoading] = useState(false);
-  const [userExpenseLoading, setUserExpenseLoading] = useState(false);
   // --- Lembretes ---
   const [reminders, setReminders] = useState<any[]>([]);
   const [reminderLoading, setReminderLoading] = useState(false);
@@ -123,15 +122,14 @@ const Dashboard: React.FC = () => {
   }, [currentUser]);
 
   const fetchUserExpenseTotal = async (userId: string) => {
-    setUserExpenseLoading(true);
     try {
       const res = await fetch(`http://localhost:5000/api/expense/user/${userId}`);
-      const data = await res.json();
-  // ...existing code...
+      await res.json();
+      // ...existing code...
     } catch (e) {
       // ...existing code...
     } finally {
-      setUserExpenseLoading(false);
+      // ...existing code...
     }
   };
   // Buscar total de despesas do mês atual ao carregar
@@ -183,8 +181,8 @@ const Dashboard: React.FC = () => {
 
   const fetchUserSalary = async (userId: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/salary/user/${userId}`);
-      const data = await res.json();
+  const res = await fetch(`http://localhost:5000/api/salary/user/${userId}`);
+  await res.json();
   // ...existing code...
     } catch (e) {
       setSalaryInput('');
@@ -200,10 +198,10 @@ const Dashboard: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user: currentUser._id, value: Number(salaryInput), date: salaryDate })
       });
-      const data = await res.json();
+  await res.json();
       // Só atualiza o card se o salário adicionado for do mês atual
       const now = new Date();
-      const salaryDateObj = new Date(data.data?.date);
+  // ...existing code...
       // Limpa os campos após adicionar
       setSalaryInput('');
       setSalaryDate(now.toISOString().slice(0, 10));
