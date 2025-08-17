@@ -71,8 +71,11 @@ const Dashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchAllReminders();
-  }, []);
+    // Só busca lembretes quando currentUser estiver carregado
+    if (currentUser && currentUser._id) {
+      fetchAllReminders();
+    }
+  }, [currentUser]);
 
   const handleSaveReminder = async () => {
     if (!currentUser || !reminderTitle) return;
@@ -386,7 +389,7 @@ const Dashboard: React.FC = () => {
             <div className="bg-gradient-to-r from-green-500 to-green-600 dark:from-green-700 dark:to-green-900 p-4 rounded-lg text-white shadow-lg flex flex-col justify-between min-h-[80px]">
               <div className="flex justify-between items-center">
                 <div>
-                  <h3 className="flex items-center text-sm font-semibold"><FaPiggyBank className="mr-1"/> Saldo do Mes (Global)</h3>
+                  <h3 className="flex items-center text-sm font-semibold"><FaPiggyBank className="mr-1"/> Saldo do Mes</h3>
                   <p className="mt-2 text-2xl font-bold">
                     {salaryLoading || expenseLoading ? '...' :
                       (salaryTotal !== null && expenseTotal !== null)
