@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { FaPiggyBank, FaEuroSign, FaChartLine } from 'react-icons/fa';
 import { getInvestmentEntriesYear } from '../services/investmentEntryService';
+import { getTotalInvestmentEntries } from '../services/getTotalInvestmentEntries';
 import { getAllInvestments } from '../services/getAllInvestments';
 import { toEuro } from '../utils/currency';
 import { addInvestmentEntry } from '../services/addInvestmentEntry';
@@ -18,6 +19,7 @@ const cardGradients = [
 
 const Investimento: React.FC = () => {
 		const [entradasAnoEuro, setEntradasAnoEuro] = useState(0);
+		const [entradasTotal, setEntradasTotal] = useState(0);
 		const [totalAtivosEuro, setTotalAtivosEuro] = useState(0);
 		const [entradaValor, setEntradaValor] = useState('');
 		const [ativoNome, setAtivoNome] = useState('');
@@ -41,13 +43,14 @@ const Investimento: React.FC = () => {
 		const [showEntradaForm, setShowEntradaForm] = useState(false);
 
 		const atualizarDados = () => {
-						const year = new Date().getFullYear();
-						getInvestmentEntriesYear(year).then(entries => {
-							console.log('Entradas Anual:', entries);
-							const totalEuro = entries.reduce((sum: number, e: any) => sum + toEuro(e.value, e.moeda), 0);
-							console.log('Total Euro:', totalEuro);
-							setEntradasAnoEuro(totalEuro);
-						});
+			const year = new Date().getFullYear();
+			getInvestmentEntriesYear(year).then(entries => {
+				const totalEuro = entries.reduce((sum: number, e: any) => sum + toEuro(e.value, e.moeda), 0);
+				setEntradasAnoEuro(totalEuro);
+			});
+			getTotalInvestmentEntries().then(total => {
+				setEntradasTotal(total);
+			});
 			getAllInvestments().then(investments => {
 				setAtivos(investments);
 				let brl = 0, usd = 0, eur = 0;
@@ -104,7 +107,8 @@ const Investimento: React.FC = () => {
 										<FaEuroSign className="text-2xl md:text-3xl opacity-80" />
 										<span className="text-base md:text-lg font-semibold">Entradas Anual</span>
 									</div>
-									<span className="text-2xl md:text-3xl font-bold">{entradasAnoEuro.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
+									<span className="text-lg md:text-xl font-semibold block mb-1">Ano atual: {entradasAnoEuro.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
+									<span className="text-lg md:text-xl font-semibold block">Total global: {entradasTotal.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
 								</div>
 								<div className={`${cardBase} ${cardGradients[1]}`}> 
 									<div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
