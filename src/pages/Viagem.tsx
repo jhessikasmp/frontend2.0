@@ -140,9 +140,9 @@ const Viagem: React.FC = () => {
           (e.currentTarget.elements[0] as HTMLInputElement).value = '';
           (e.currentTarget.elements[1] as HTMLInputElement).value = '';
           (e.currentTarget.elements[2] as HTMLInputElement).value = '';
-            // Atualiza histórico de despesas
-            import('../services/getViagemExpenses').then(({ getViagemExpenses }) => {
-              getViagemExpenses(userId).then(arr => setDespesas(arr));
+            // Atualiza histórico de despesas (global)
+            import('../services/getAllViagemExpenses').then(({ getAllViagemExpenses }) => {
+              getAllViagemExpenses().then(arr => setDespesas(arr));
             });
         }}>
           <input type="text" placeholder="Nome da Despesa" className="input w-full" required />
