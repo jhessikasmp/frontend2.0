@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-export async function getAnnualExpenses(userId: string, year: number) {
+// Busca a soma anual de despesas para todos os usuários
+export async function getAnnualExpenses(year: number) {
   const apiUrl = import.meta.env.VITE_API_URL;
-  const res = await axios.get(`${apiUrl}/api/expense/user/${userId}/year/${year}`);
+  const res = await axios.get(`${apiUrl}/api/expense/annual-by-user/${year}`);
   return res.data.data || [];
 }

@@ -12,35 +12,37 @@ const RelatorioAnual: React.FC = () => {
 	const [monthlyExpenses, setMonthlyExpenses] = useState<any[]>([]);
 	const year = new Date().getFullYear();
 
-	useEffect(() => {
-		getAllUsers().then((res: any) => {
-			const userList = res.data || res;
-			setUsers(userList);
-			userList.forEach((user: any) => {
-				Promise.all([
-					getAnnualSalary(user._id, year),
-					getAnnualExpenses(user._id, year)
-				]).then(([salaryArr, expensesArr]) => {
-					const salary = salaryArr.reduce((sum: number, s: any) => sum + (s.value || 0), 0);
-					const expenses = expensesArr.reduce((sum: number, e: any) => sum + (e.value || 0), 0);
-					setAnnualData(prev => ({
-						...prev,
-						[user._id]: {
-							salary,
-							expenses,
-							saldo: salary - expenses
-						}
-					}));
+		useEffect(() => {
+			getAllUsers().then((res: any) => {
+				const userList = res.data || res;
+				setUsers(userList);
+				getAnnualExpenses(year).then((annualExpensesArr: any[]) => {
+					userList.forEach((user: any) => {
+						Promise.all([
+							getAnnualSalary(user._id, year)
+						]).then(([salaryArr]) => {
+							const salary = salaryArr.reduce((sum: number, s: any) => sum + (s.value || 0), 0);
+							const userExpenseObj = annualExpensesArr.find(e => e._id === user._id);
+							const expenses = userExpenseObj ? userExpenseObj.total : 0;
+							setAnnualData(prev => ({
+								...prev,
+								[user._id]: {
+									salary,
+									expenses,
+									saldo: salary - expenses
+								}
+							}));
+						});
+					});
 				});
 			});
-		});
-		getAllUsersMonthlyExpenses().then((data: any[]) => {
-			setMonthlyExpenses(data.map(item => ({
-				name: `${item._id.month}/${item._id.year}`,
-				total: item.total
-			})));
-		});
-	}, [year]);
+			getAllUsersMonthlyExpenses().then((data: any[]) => {
+				setMonthlyExpenses(data.map(item => ({
+					name: `${item._id.month}/${item._id.year}`,
+					total: item.total
+				})));
+			});
+		}, [year]);
 
 	return (
 		<main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
