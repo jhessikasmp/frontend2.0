@@ -2,7 +2,13 @@ import axios from 'axios';
 
 export async function getViagemEntriesYear(userId: string, year: number) {
   const apiUrl = import.meta.env.VITE_API_URL;
-  const res = await axios.get(`${apiUrl}/api/viagem-entry/year/${userId}/${year}`);
+  let url;
+  if (!userId) {
+    url = `${apiUrl}/api/viagem-entry/year/${year}`;
+  } else {
+    url = `${apiUrl}/api/viagem-entry/year/${userId}/${year}`;
+  }
+  const res = await axios.get(url);
   return res.data.data || [];
 }
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FaMoneyBillWave, FaWallet, FaPiggyBank } from 'react-icons/fa';
 import { getViagemEntriesYear } from '../services/viagemEntryService';
-import { getViagemExpensesTotal } from '../services/viagemExpenseService';
+import { getAllViagemExpenses } from '../services/getAllViagemExpenses';
 
 const Viagem: React.FC = () => {
   const [entradasAnual, setEntradasAnual] = useState(0);
@@ -24,22 +24,21 @@ const Viagem: React.FC = () => {
   const [showEntradaForm, setShowEntradaForm] = useState(false);
 
   useEffect(() => {
-    if (!userId) return;
     const year = new Date().getFullYear();
-    getViagemEntriesYear(userId, year).then((entries: any[]) => {
+    // Entradas anual (global)
+    getViagemEntriesYear('', year).then((entries: any[]) => {
       const total = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
       setEntradasAnual(total);
       setSaldoFundo(total - totalDespesas);
     });
-    getViagemExpensesTotal(userId).then((total: number) => {
+    // Total de despesas e histórico (global)
+    getAllViagemExpenses().then((arr: any[]) => {
+      setDespesas(arr);
+      const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
       setTotalDespesas(total);
       setSaldoFundo(entradasAnual - total);
     });
-    // Buscar histórico de despesas
-    import('../services/getViagemExpenses').then(({ getViagemExpenses }) => {
-      getViagemExpenses(userId).then((arr: any[]) => setDespesas(arr));
-    });
-  }, [userId]);
+  }, []);
 
   useEffect(() => {
     setSaldoFundo(entradasAnual - totalDespesas);
@@ -92,17 +91,16 @@ const Viagem: React.FC = () => {
               setEntradaValor('');
               // Atualiza os cards após adicionar
               const year = new Date().getFullYear();
-              getViagemEntriesYear(userId, year).then((entries: any[]) => {
+              // Atualiza os cards após adicionar (global)
+              getViagemEntriesYear('', year).then((entries: any[]) => {
                 const total = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
                 setEntradasAnual(total);
               });
-              getViagemExpensesTotal(userId).then((total: number) => {
+              getAllViagemExpenses().then((arr: any[]) => {
+                setDespesas(arr);
+                const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
                 setTotalDespesas(total);
               });
-                // Atualiza histórico de despesas
-                import('../services/getViagemExpenses').then(({ getViagemExpenses }) => {
-                  getViagemExpenses(userId).then(arr => setDespesas(arr));
-                });
             }}>
               <input type="number" placeholder="Valor da Entrada (em Euro)" className="input w-full" value={entradaValor} onChange={e => setEntradaValor(e.target.value)} min={0} step={0.01} required />
               <div className="flex gap-4 mt-2">
@@ -127,11 +125,14 @@ const Viagem: React.FC = () => {
           const { addViagemExpense } = await import('../services/addViagemExpense');
           await addViagemExpense(userId, nomeInput, valorInput, dataInput);
           // Atualiza os cards após adicionar
-          getViagemExpensesTotal(userId).then((total: number) => {
+          // Atualiza os cards após adicionar despesa (global)
+          getAllViagemExpenses().then((arr: any[]) => {
+            setDespesas(arr);
+            const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
             setTotalDespesas(total);
           });
           const year = new Date().getFullYear();
-          getViagemEntriesYear(userId, year).then((entries: any[]) => {
+          getViagemEntriesYear('', year).then((entries: any[]) => {
             const total = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
             setEntradasAnual(total);
           });
