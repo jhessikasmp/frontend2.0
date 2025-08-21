@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getAllUsers } from '../services/userService';
 import { getAnnualSalary } from '../services/getAnnualSalary';
 import { getAnnualExpenses } from '../services/getAnnualExpenses';
+import { getAnnualTotalWithEntries } from '../services/getAnnualTotalWithEntries';
 import { getAllUsersMonthlyExpenses } from '../services/getAllUsersMonthlyExpenses';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
@@ -16,7 +17,7 @@ const RelatorioAnual: React.FC = () => {
 			getAllUsers().then((res: any) => {
 				const userList = res.data || res;
 				setUsers(userList);
-				getAnnualExpenses(year).then((annualExpensesArr: any[]) => {
+				getAnnualTotalWithEntries(year).then((annualExpensesArr: any[]) => {
 					userList.forEach((user: any) => {
 						Promise.all([
 							getAnnualSalary(user._id, year)
