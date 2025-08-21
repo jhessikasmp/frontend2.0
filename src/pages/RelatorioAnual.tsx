@@ -69,18 +69,7 @@ const RelatorioAnual: React.FC = () => {
 					</div>
 				))}
 			</div>
-				<div className="mt-10">
-					<h2 className="text-xl font-bold mb-4 text-red-700 dark:text-red-300">Despesas Mensais Totais (Todos Usuários)</h2>
-				<ResponsiveContainer width="100%" height={180}>
-						<BarChart data={monthlyExpenses} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-							<CartesianGrid strokeDasharray="3 3" />
-							<XAxis dataKey="name" />
-							<YAxis />
-							<Tooltip formatter={value => `€ ${Number(value).toLocaleString('de-DE', { minimumFractionDigits: 2 })}`} />
-							<Bar dataKey="total" fill="#ef4444" name="Despesas" />
-						</BarChart>
-					</ResponsiveContainer>
-				</div>
+				{/* Gráfico removido. Adicione um novo gráfico aqui se desejar. */}
 			</main>
 	);
 };
