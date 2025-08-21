@@ -4,6 +4,7 @@ import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { FaMoneyBillWave, FaWallet, FaPiggyBank, FaUserCircle, FaBell, FaBars } from 'react-icons/fa';
 
 import { safeGetFromStorage } from '../utils/storage';
+import { getCurrentMonthTotalExpensesWithEntries } from '../services/getCurrentMonthTotalExpensesWithEntries';
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const Dashboard: React.FC = () => {
@@ -143,13 +144,8 @@ const Dashboard: React.FC = () => {
   const fetchExpenseTotal = async () => {
     setExpenseLoading(true);
     try {
-      const res = await fetch(`${apiUrl}/api/expense/total-with-entries`);
-      const data = await res.json();
-      if (data.success) {
-        setExpenseTotal(data.total);
-      } else {
-        setExpenseTotal(null);
-      }
+      const total = await getCurrentMonthTotalExpensesWithEntries();
+      setExpenseTotal(total);
     } catch (e) {
       setExpenseTotal(null);
     } finally {
