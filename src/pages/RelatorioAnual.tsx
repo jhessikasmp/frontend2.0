@@ -39,7 +39,7 @@ const RelatorioAnual: React.FC = () => {
 			});
 			getAllUsersMonthlyExpenses().then((data: any[]) => {
 				setMonthlyExpenses(data.map(item => ({
-					name: `${item._id.month}/${item._id.year}`,
+					name: `${String(item._id.month).padStart(2, '0')}/${item._id.year}`,
 					total: item.total
 				})));
 			});
