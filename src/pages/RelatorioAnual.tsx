@@ -4,13 +4,13 @@ import { getAnnualSalary } from '../services/getAnnualSalary';
 // ...existing code...
 import { getAnnualTotalWithEntries } from '../services/getAnnualTotalWithEntries';
 import { getAllUsersMonthlyExpenses } from '../services/getAllUsersMonthlyExpenses';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+// ...existing code...
 
 
 const RelatorioAnual: React.FC = () => {
 	const [users, setUsers] = useState<any[]>([]);
 	const [annualData, setAnnualData] = useState<Record<string, { salary: number; expenses: number; saldo: number }>>({});
-	const [monthlyExpenses, setMonthlyExpenses] = useState<any[]>([]);
+	// ...existing code...
 	const year = new Date().getFullYear();
 
 		useEffect(() => {
@@ -37,12 +37,7 @@ const RelatorioAnual: React.FC = () => {
 					});
 				});
 			});
-			getAllUsersMonthlyExpenses().then((data: any[]) => {
-				setMonthlyExpenses(data.map(item => ({
-					name: `${String(item._id.month).padStart(2, '0')}/${item._id.year}`,
-					total: item.total
-				})));
-			});
+			// ...existing code...
 		}, [year]);
 
 	return (
