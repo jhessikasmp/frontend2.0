@@ -143,7 +143,7 @@ const Dashboard: React.FC = () => {
   const fetchExpenseTotal = async () => {
     setExpenseLoading(true);
     try {
-  const res = await fetch(`${apiUrl}/api/expense/current-month-total`);
+      const res = await fetch(`${apiUrl}/api/expense/total-with-entries`);
       const data = await res.json();
       if (data.success) {
         setExpenseTotal(data.total);
