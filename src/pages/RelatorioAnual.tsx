@@ -74,6 +74,8 @@ const RelatorioAnual: React.FC = () => {
 			</div>
 
 			<h2 className="text-2xl font-bold mt-10 mb-4 text-gray-900 dark:text-white">Despesas Mensais Totais (Todos Usuários)</h2>
+			{/* DEBUG: Exibe o conteúdo de monthlyExpenses */}
+			<pre className="bg-gray-100 dark:bg-zinc-800 text-xs p-2 rounded mb-4 overflow-x-auto">{JSON.stringify(monthlyExpenses, null, 2)}</pre>
 			<div className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-6 mb-6">
 				<ResponsiveContainer width="100%" height={300}>
 					<BarChart data={monthlyExpenses} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
