@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getAllUsers } from '../services/userService';
 import { getAnnualSalary } from '../services/getAnnualSalary';
-import { getAnnualExpenses } from '../services/getAnnualExpenses';
+// ...existing code...
 import { getAnnualTotalWithEntries } from '../services/getAnnualTotalWithEntries';
 import { getAllUsersMonthlyExpenses } from '../services/getAllUsersMonthlyExpenses';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
