@@ -12,42 +12,37 @@ const Emergencia: React.FC = () => {
 	const [entradasTotal, setEntradasTotal] = useState(0);
 	const [despesas, setDespesas] = useState<any[]>([]);
 	const userId = (() => {
-	try {
-		const raw = localStorage.getItem('currentUser');
-		if (!raw) return null;
-		if (raw.startsWith('{')) {
-			return JSON.parse(raw)._id;
+		try {
+			const raw = localStorage.getItem('currentUser');
+			if (!raw) return null;
+			if (raw.startsWith('{')) {
+				return JSON.parse(raw)._id;
+			}
+			return raw;
+		} catch {
+			return null;
 		}
-		return raw;
-	} catch {
-		return null;
-	}
-})();
+	})();
 	const [showEntradaForm, setShowEntradaForm] = useState(false);
 
-			useEffect(() => {
-				const year = new Date().getFullYear();
-				// Entradas anual (global)
-				getEmergencyEntriesYear('', year).then(entries => {
-					const total = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
-					setEntradasAnual(total);
-					setSaldoFundo(total - totalDespesas); // saldo inicial
-				});
-				getTotalEmergencyEntries().then(total => {
-					setEntradasTotal(total);
-				});
-				// Total de despesas e histórico (global)
-				getAllEmergencyExpenses().then(arr => {
-					setDespesas(arr);
-					const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
-					setTotalDespesas(total);
-					setSaldoFundo(entradasAnual - total); // saldo atualizado
-				});
-			}, []);
+	useEffect(() => {
+		// Montante total de entradas (global)
+		getTotalEmergencyEntries().then(total => {
+			setEntradasTotal(total);
+			setSaldoFundo(total - totalDespesas);
+		});
+		// Total de despesas e histórico (global)
+		getAllEmergencyExpenses().then(arr => {
+			setDespesas(arr);
+			const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
+			setTotalDespesas(total);
+			setSaldoFundo(entradasTotal - total);
+		});
+	}, []);
 
 	useEffect(() => {
-		setSaldoFundo(entradasAnual - totalDespesas);
-	}, [entradasAnual, totalDespesas]);
+		setSaldoFundo(entradasTotal - totalDespesas);
+	}, [entradasTotal, totalDespesas]);
 
 	return (
 			<main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
