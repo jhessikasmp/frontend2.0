@@ -57,8 +57,12 @@ const Carro: React.FC = () => {
 
 	return (
 		<main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
-			{/* DEBUG: Exibe as entradas anuais de carro */}
-			<pre className="bg-gray-100 dark:bg-zinc-800 text-xs p-2 rounded mb-4 overflow-x-auto">{JSON.stringify(carroEntriesDebug, null, 2)}</pre>
+			{/* DEBUG: Teste de renderização */}
+			<pre className="bg-gray-100 dark:bg-zinc-800 text-xs p-2 rounded mb-4 overflow-x-auto">
+				DEBUG TESTE
+				userId: {String(userId)}
+				carroEntriesDebug: {JSON.stringify(carroEntriesDebug, null, 2)}
+			</pre>
 			<h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Fundo de Carro</h1>
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
 							<div className="bg-gradient-to-r from-blue-500 to-blue-600 p-2 md:p-4 rounded-lg text-white shadow-lg flex flex-col justify-between min-h-[40px] md:min-h-[80px]">
