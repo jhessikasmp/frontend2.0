@@ -28,10 +28,12 @@ const Carro: React.FC = () => {
 })();
 	const [showEntradaForm, setShowEntradaForm] = useState(false);
 
+	const [carroEntriesDebug, setCarroEntriesDebug] = useState<any[]>([]);
 	useEffect(() => {
 		if (!userId) return;
 		const year = new Date().getFullYear();
 		getCarroEntriesYear(userId, year).then((entries: any[]) => {
+			setCarroEntriesDebug(entries); // DEBUG: Salva entradas para exibir
 			const total = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
 			setEntradasAnual(total);
 			setSaldoFundo(total - totalDespesas);
@@ -55,8 +57,10 @@ const Carro: React.FC = () => {
 
 	return (
 		<main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
+			{/* DEBUG: Exibe as entradas anuais de carro */}
+			<pre className="bg-gray-100 dark:bg-zinc-800 text-xs p-2 rounded mb-4 overflow-x-auto">{JSON.stringify(carroEntriesDebug, null, 2)}</pre>
 			<h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Fundo de Carro</h1>
-						<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+			<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
 							<div className="bg-gradient-to-r from-blue-500 to-blue-600 p-2 md:p-4 rounded-lg text-white shadow-lg flex flex-col justify-between min-h-[40px] md:min-h-[80px]">
 								<div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
 									<FaMoneyBillWave className="text-2xl md:text-3xl opacity-80" />
