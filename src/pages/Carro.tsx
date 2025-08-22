@@ -36,14 +36,12 @@ const Carro: React.FC = () => {
 			setCarroEntriesDebug(entries); // DEBUG: Salva entradas para exibir
 			const total = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
 			setEntradasAnual(total);
-			setSaldoFundo(total - totalDespesas);
 		});
 		getTotalCarroEntries(userId).then((total: number) => {
 			setEntradasTotal(total);
 		});
 		getCarroExpensesTotal(userId).then((total: number) => {
 			setTotalDespesas(total);
-			setSaldoFundo(entradasAnual - total);
 		});
 		// Buscar histórico de despesas
 		import('../services/getCarroExpenses').then(({ getCarroExpenses }) => {
@@ -52,8 +50,8 @@ const Carro: React.FC = () => {
 	}, [userId]);
 
 	useEffect(() => {
-		setSaldoFundo(entradasAnual - totalDespesas);
-	}, [entradasAnual, totalDespesas]);
+		setSaldoFundo(entradasTotal - totalDespesas);
+	}, [entradasTotal, totalDespesas]);
 
 	return (
 		<main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
