@@ -123,7 +123,7 @@ const Investimento: React.FC = () => {
 										<FaChartLine className="text-2xl md:text-3xl opacity-80" />
 										<span className="text-base md:text-lg font-semibold">Lucro / Prejuízo</span>
 									</div>
-									<span className="text-2xl md:text-3xl font-bold text-yellow-800 dark:text-yellow-200">{(entradasAnoEuro - totalAtivosEuro).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
+									<span className="text-2xl md:text-3xl font-bold text-yellow-800 dark:text-yellow-200">{(entradasTotal - totalAtivosEuro).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
 								</div>
 							</div>
 												{/* Botão para mostrar formulário de entrada */}
