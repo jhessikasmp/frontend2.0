@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { getAllUsers } from '../services/userService';
 import { getAnnualSalary } from '../services/getAnnualSalary';
 import { getAllUsersMonthlyExpenses } from '../services/getAllUsersMonthlyExpenses';
@@ -12,7 +11,6 @@ import { getAnnualTotalWithEntries } from '../services/getAnnualTotalWithEntries
 const RelatorioAnual: React.FC = () => {
 	const [users, setUsers] = useState<any[]>([]);
 	const [annualData, setAnnualData] = useState<Record<string, { salary: number; expenses: number; saldo: number }>>({});
-	const [monthlyExpenses, setMonthlyExpenses] = useState<any[]>([]);
 	const year = new Date().getFullYear();
 
 	useEffect(() => {
@@ -44,7 +42,6 @@ const RelatorioAnual: React.FC = () => {
 			const filtered = data.filter(d => d._id.year === year);
 			// Ordena por mês
 			filtered.sort((a, b) => a._id.month - b._id.month);
-			setMonthlyExpenses(filtered);
 		});
 	}, [year]);
 
