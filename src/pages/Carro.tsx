@@ -28,12 +28,10 @@ const Carro: React.FC = () => {
 })();
 	const [showEntradaForm, setShowEntradaForm] = useState(false);
 
-	const [carroEntriesDebug, setCarroEntriesDebug] = useState<any[]>([]);
 	useEffect(() => {
 		if (!userId) return;
 		const year = new Date().getFullYear();
 		getCarroEntriesYear(userId, year).then((entries: any[]) => {
-			setCarroEntriesDebug(entries); // DEBUG: Salva entradas para exibir
 			const total = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
 			setEntradasAnual(total);
 		});
