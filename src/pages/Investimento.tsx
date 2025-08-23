@@ -121,9 +121,9 @@ const Investimento: React.FC = () => {
 								<div className={`${cardBase} ${cardGradients[2]}`}> 
 									<div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
 										<FaChartLine className="text-2xl md:text-3xl opacity-80" />
-										<span className="text-base md:text-lg font-semibold">Lucro / Prejuízo</span>
+										<span className="text-base md:text-lg font-semibold">{(entradasTotal - totalAtivosEuro) < 0 ? 'Lucro' : 'Prejuízo'}</span>
 									</div>
-									<span className="text-2xl md:text-3xl font-bold text-yellow-800 dark:text-yellow-200">{(entradasTotal - totalAtivosEuro).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
+									<span className="text-2xl md:text-3xl font-bold text-yellow-800 dark:text-yellow-200">{Math.abs(entradasTotal - totalAtivosEuro).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
 								</div>
 							</div>
 												{/* Botão para mostrar formulário de entrada */}
