@@ -259,7 +259,7 @@ const Dashboard: React.FC = () => {
             </button>
             <FaWallet className="h-8 w-8 text-primary-600 shrink-0" />
             <div className="ml-3 flex flex-col min-w-0">
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-white truncate">JS FinanceApp</h1>
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-white truncate">JSFinance</h1>
               {currentUser?.name && (
                 <span className="text-sm text-gray-600 dark:text-gray-300 font-normal truncate">Bem-vindo, {currentUser.name}</span>
               )}
