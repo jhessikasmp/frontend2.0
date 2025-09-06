@@ -13,27 +13,30 @@ import RelatorioAnual from './pages/RelatorioAnual';
 
 
 import './styles/globals.css';
+import { ValueVisibilityProvider } from './context/ValueVisibilityContext';
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/dashboard/*" element={<Dashboard />}>
-            <Route path="despesas" element={<Despesas />} />
-            <Route path="investimento" element={<Investimento />} />
-            <Route path="emergencia" element={<Emergencia />} />
-            <Route path="viagens" element={<Viagens />} />
-            <Route path="carro" element={<Carro />} />
-            <Route path="mesada" element={<Mesada />} />
-            <Route path="relatorio-anual" element={<RelatorioAnual />} />
-          </Route>
-          <Route path="/" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </div>
-    </Router>
+    <ValueVisibilityProvider>
+      <Router>
+        <div className="App">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/dashboard/*" element={<Dashboard />}>
+              <Route path="despesas" element={<Despesas />} />
+              <Route path="investimento" element={<Investimento />} />
+              <Route path="emergencia" element={<Emergencia />} />
+              <Route path="viagens" element={<Viagens />} />
+              <Route path="carro" element={<Carro />} />
+              <Route path="mesada" element={<Mesada />} />
+              <Route path="relatorio-anual" element={<RelatorioAnual />} />
+            </Route>
+            <Route path="/" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </div>
+      </Router>
+    </ValueVisibilityProvider>
   );
 }
 

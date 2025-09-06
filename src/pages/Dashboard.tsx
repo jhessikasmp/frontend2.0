@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 
-import { FaMoneyBillWave, FaWallet, FaPiggyBank, FaUserCircle, FaBell, FaBars } from 'react-icons/fa';
+import { FaMoneyBillWave, FaWallet, FaPiggyBank, FaUserCircle, FaBell, FaBars, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useValueVisibility } from '../context/ValueVisibilityContext';
 
 import { safeGetFromStorage } from '../utils/storage';
 import { getCurrentMonthTotalExpensesWithEntries } from '../services/getCurrentMonthTotalExpensesWithEntries';
@@ -31,6 +32,7 @@ const Dashboard: React.FC = () => {
     return false;
   });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { showValues, setShowValues } = useValueVisibility();
   const [salaryTotal, setSalaryTotal] = useState<number | null>(null);
   const [salaryLoading, setSalaryLoading] = useState(false);
   const [salaryInput, setSalaryInput] = useState('');
@@ -267,6 +269,9 @@ const Dashboard: React.FC = () => {
             <button onClick={() => setDark(d => !d)} title={dark ? 'Modo claro' : 'Modo escuro'}>
               {dark ? <span className="h-5 w-5">🌙</span> : <span className="h-5 w-5">☀️</span>}
             </button>
+            <button onClick={() => setShowValues(!showValues)} title={showValues ? 'Ocultar valores' : 'Mostrar valores'}>
+              {showValues ? <FaEye className="h-5 w-5" /> : <FaEyeSlash className="h-5 w-5" />}
+            </button>
             <button onClick={handleLogout} className="text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400">Sair</button>
             <FaUserCircle className="h-8 w-8 text-gray-400 ml-2" />
           </div>
@@ -367,13 +372,13 @@ const Dashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-800 dark:to-blue-900 p-4 rounded-lg text-white shadow-lg flex flex-col justify-between min-h-[80px]">
               <h3 className="flex items-center text-sm font-semibold"><FaMoneyBillWave className="mr-1"/> Salário do Mes (Todos Usuários)</h3>
-              <p className="mt-2 text-2xl font-bold">{salaryLoading ? '...' : salaryTotal !== null ? `€ ${salaryTotal.toLocaleString('de-DE', { minimumFractionDigits: 2 })}` : 'Não informado'}</p>
+              <p className="mt-2 text-2xl font-bold">{!showValues ? '•••' : salaryLoading ? '...' : salaryTotal !== null ? `€ ${salaryTotal.toLocaleString('de-DE', { minimumFractionDigits: 2 })}` : 'Não informado'}</p>
             </div>
             <div className="bg-gradient-to-r from-red-500 to-red-600 dark:from-red-700 dark:to-red-900 p-4 rounded-lg text-white shadow-lg flex flex-col justify-between min-h-[80px]">
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="flex items-center text-sm font-semibold"><FaWallet className="mr-1"/> Despesas do Mes</h3>
-                  <p className="mt-2 text-2xl font-bold">{expenseLoading ? '...' : expenseTotal !== null ? `€ ${expenseTotal.toLocaleString('de-DE', { minimumFractionDigits: 2 })}` : 'Não informado'}</p>
+                  <p className="mt-2 text-2xl font-bold">{!showValues ? '•••' : expenseLoading ? '...' : expenseTotal !== null ? `€ ${expenseTotal.toLocaleString('de-DE', { minimumFractionDigits: 2 })}` : 'Não informado'}</p>
                 </div>
               </div>
             </div>
@@ -382,7 +387,7 @@ const Dashboard: React.FC = () => {
                 <div>
                   <h3 className="flex items-center text-sm font-semibold"><FaPiggyBank className="mr-1"/> Saldo do Mes</h3>
                   <p className="mt-2 text-2xl font-bold">
-                    {salaryLoading || expenseLoading ? '...' :
+                    {!showValues ? '•••' : salaryLoading || expenseLoading ? '...' :
                       (salaryTotal !== null && expenseTotal !== null)
                         ? `€ ${(salaryTotal - expenseTotal).toLocaleString('de-DE', { minimumFractionDigits: 2 })}`
                         : 'Não informado'}

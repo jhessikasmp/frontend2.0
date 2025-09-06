@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useValueVisibility } from '../context/ValueVisibilityContext';
 const apiUrl = import.meta.env.VITE_API_URL;
 import { FaWallet } from 'react-icons/fa';
 import { safeGetFromStorage } from '../utils/storage';
@@ -30,6 +31,7 @@ interface Despesa {
 }
 
 const Despesas: React.FC = () => {
+	const { showValues } = useValueVisibility();
 	const [form, setForm] = useState({ nome: '', valor: '', categoria: '', data: '', descricao: '' });
 	const [despesas, setDespesas] = useState<Despesa[]>([]);
 	const [groupedPrevious, setGroupedPrevious] = useState<Record<string, Despesa[]>>({});
@@ -168,7 +170,7 @@ const Despesas: React.FC = () => {
 					<div className="flex items-center justify-between">
 						<div>
 							<h3 className="flex items-center text-sm md:text-base font-semibold"><FaWallet className="mr-2"/> Total de Despesas do Mês</h3>
-							<p className="mt-1 md:mt-2 text-2xl md:text-3xl font-bold">€ {totalMes.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</p>
+							  <p className="mt-1 md:mt-2 text-2xl md:text-3xl font-bold">{!showValues ? '•••' : `€ ${totalMes.toLocaleString('de-DE', { minimumFractionDigits: 2 })}`}</p>
 						</div>
 					</div>
 				</div>
@@ -244,7 +246,7 @@ const Despesas: React.FC = () => {
 										<div className="text-xs text-gray-500">{d.categoria} | {d.data} | <span className="text-blue-600">{d.usuario}</span></div>
 										{d.descricao && <div className="text-xs text-gray-400 mt-1">{d.descricao}</div>}
 									</div>
-									<div className="font-bold text-red-600">€ {d.valor.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</div>
+									  <div className="font-bold text-red-600">{!showValues ? '•••' : `€ ${d.valor.toLocaleString('de-DE', { minimumFractionDigits: 2 })}`}</div>
 								</li>
 							))}
 						</ul>
@@ -275,7 +277,7 @@ const Despesas: React.FC = () => {
 												<div className="text-xs text-gray-500">{d.categoria} | {d.data} | <span className="text-blue-600">{d.usuario}</span></div>
 												{d.descricao && <div className="text-xs text-gray-400 mt-1">{d.descricao}</div>}
 											</div>
-											<div className="font-bold text-red-600">€ {d.valor.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</div>
+											<div className="font-bold text-red-600">{!showValues ? '•••' : `€ ${d.valor.toLocaleString('de-DE', { minimumFractionDigits: 2 })}`}</div>
 										</li>
 									))}
 								</ul>

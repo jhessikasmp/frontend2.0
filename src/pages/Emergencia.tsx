@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useValueVisibility } from '../context/ValueVisibilityContext';
 import { FaMoneyBillWave, FaWallet, FaPiggyBank } from 'react-icons/fa';
 import { getEmergencyEntriesYear } from '../services/emergencyEntryService';
 import { getTotalEmergencyEntries } from '../services/getTotalEmergencyEntries';
 import { getAllEmergencyExpenses } from '../services/emergencyExpenseService';
 
 const Emergencia: React.FC = () => {
+	const { showValues } = useValueVisibility();
 	const [entradasAnual, setEntradasAnual] = useState(0);
 	const [totalDespesas, setTotalDespesas] = useState(0);
 	const [saldoFundo, setSaldoFundo] = useState(0);
@@ -53,22 +55,22 @@ const Emergencia: React.FC = () => {
 										<FaMoneyBillWave className="text-2xl md:text-3xl opacity-80" />
 										<span className="text-base md:text-lg font-semibold">Entradas Anual</span>
 									</div>
-									<span className="text-lg md:text-xl font-semibold block mb-1">Ano atual: {entradasAnual.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
-									<span className="text-lg md:text-xl font-semibold block">Total global: {entradasTotal.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
+									  <span className="text-lg md:text-xl font-semibold block mb-1">Ano atual: {!showValues ? '•••' : entradasAnual.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
+									  <span className="text-lg md:text-xl font-semibold block">Total global: {!showValues ? '•••' : entradasTotal.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
 								</div>
 								<div className="bg-gradient-to-r from-red-500 to-red-600 p-2 md:p-4 rounded-lg text-white shadow-lg flex flex-col justify-between min-h-[40px] md:min-h-[80px]">
 									<div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
 										<FaWallet className="text-2xl md:text-3xl opacity-80" />
 										<span className="text-base md:text-lg font-semibold">Total de Despesas</span>
 									</div>
-									<span className="text-2xl md:text-3xl font-bold">€ {totalDespesas.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</span>
+									  <span className="text-2xl md:text-3xl font-bold">{!showValues ? '•••' : `€ ${totalDespesas.toLocaleString('de-DE', { minimumFractionDigits: 2 })}`}</span>
 								</div>
 								<div className="bg-gradient-to-r from-green-500 to-green-600 p-2 md:p-4 rounded-lg text-white shadow-lg flex flex-col justify-between min-h-[40px] md:min-h-[80px]">
 									<div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
 										<FaPiggyBank className="text-2xl md:text-3xl opacity-80" />
 										<span className="text-base md:text-lg font-semibold">Saldo do Fundo</span>
 									</div>
-									<span className="text-2xl md:text-3xl font-bold">€ {saldoFundo.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</span>
+									  <span className="text-2xl md:text-3xl font-bold">{!showValues ? '•••' : `€ ${saldoFundo.toLocaleString('de-DE', { minimumFractionDigits: 2 })}`}</span>
 								</div>
 							</div>
 

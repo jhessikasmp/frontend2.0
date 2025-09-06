@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+import { useValueVisibility } from '../context/ValueVisibilityContext';
 import { FaPiggyBank, FaEuroSign, FaChartLine } from 'react-icons/fa';
 import { getInvestmentEntriesYear } from '../services/investmentEntryService';
 import { getTotalInvestmentEntries } from '../services/getTotalInvestmentEntries';
@@ -18,6 +19,7 @@ const cardGradients = [
 ];
 
 const Investimento: React.FC = () => {
+	const { showValues } = useValueVisibility();
 		const [entradasAnoEuro, setEntradasAnoEuro] = useState(0);
 		const [entradasTotal, setEntradasTotal] = useState(0);
 		const [totalAtivosEuro, setTotalAtivosEuro] = useState(0);
@@ -107,23 +109,23 @@ const Investimento: React.FC = () => {
 										<FaEuroSign className="text-2xl md:text-3xl opacity-80" />
 										<span className="text-base md:text-lg font-semibold">Entradas Anual</span>
 									</div>
-									<span className="text-lg md:text-xl font-semibold block mb-1">Ano atual: {entradasAnoEuro.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
-									<span className="text-lg md:text-xl font-semibold block">Total global: {entradasTotal.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
+									  <span className="text-lg md:text-xl font-semibold block mb-1">Ano atual: {!showValues ? '•••' : entradasAnoEuro.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
+									  <span className="text-lg md:text-xl font-semibold block">Total global: {!showValues ? '•••' : entradasTotal.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
 								</div>
 								<div className={`${cardBase} ${cardGradients[1]}`}> 
 									<div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
 										<FaPiggyBank className="text-2xl md:text-3xl opacity-80" />
 										<span className="text-base md:text-lg font-semibold">Total de Ativos</span>
 									</div>
-									<span className="text-2xl md:text-3xl font-bold">{totalAtivosEuro.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
-									<span className="block text-xs mt-1 md:mt-2 text-white/80">{totalAtivosEuro > 0 && <span>Total em EUR: {totalAtivosEuro.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>}</span>
+									  <span className="text-2xl md:text-3xl font-bold">{!showValues ? '•••' : totalAtivosEuro.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
+									  <span className="block text-xs mt-1 md:mt-2 text-white/80">{!showValues ? '' : totalAtivosEuro > 0 && <span>Total em EUR: {totalAtivosEuro.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>}</span>
 								</div>
 								<div className={`${cardBase} ${cardGradients[2]}`}> 
 									<div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
 										<FaChartLine className="text-2xl md:text-3xl opacity-80" />
 										<span className="text-base md:text-lg font-semibold">{(entradasTotal - totalAtivosEuro) < 0 ? 'Lucro' : 'Prejuízo'}</span>
 									</div>
-									<span className="text-2xl md:text-3xl font-bold text-yellow-800 dark:text-yellow-200">{Math.abs(entradasTotal - totalAtivosEuro).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
+									  <span className="text-2xl md:text-3xl font-bold text-yellow-800 dark:text-yellow-200">{!showValues ? '•••' : Math.abs(entradasTotal - totalAtivosEuro).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
 								</div>
 							</div>
 												{/* Botão para mostrar formulário de entrada */}

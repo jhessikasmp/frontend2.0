@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useValueVisibility } from '../context/ValueVisibilityContext';
 import { getAllUsers } from '../services/userService';
 import { getAnnualSalary } from '../services/getAnnualSalary';
 import { getAllUsersMonthlyExpenses } from '../services/getAllUsersMonthlyExpenses';
@@ -9,6 +10,7 @@ import { getAnnualTotalWithEntries } from '../services/getAnnualTotalWithEntries
 
 
 const RelatorioAnual: React.FC = () => {
+	const { showValues } = useValueVisibility();
 	const [users, setUsers] = useState<any[]>([]);
 	const [annualData, setAnnualData] = useState<Record<string, { salary: number; expenses: number; saldo: number }>>({});
 	const year = new Date().getFullYear();
@@ -55,15 +57,15 @@ const RelatorioAnual: React.FC = () => {
 						<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 							<div className="bg-gradient-to-r from-blue-500 to-blue-600 p-2 md:p-4 rounded-lg text-white shadow flex flex-col justify-between min-h-[40px] md:min-h-[80px]">
 								<span className="text-base md:text-lg font-semibold mb-1 md:mb-2">Salários Anual</span>
-								<span className="text-xl md:text-2xl font-bold">€ {annualData[user._id]?.salary?.toLocaleString('de-DE', { minimumFractionDigits: 2 }) || '0,00'}</span>
+								<span className="text-xl md:text-2xl font-bold">{!showValues ? '•••' : `€ ${annualData[user._id]?.salary?.toLocaleString('de-DE', { minimumFractionDigits: 2 }) || '0,00'}`}</span>
 							</div>
 							<div className="bg-gradient-to-r from-red-500 to-red-600 p-2 md:p-4 rounded-lg text-white shadow flex flex-col justify-between min-h-[40px] md:min-h-[80px]">
 								<span className="text-base md:text-lg font-semibold mb-1 md:mb-2">Despesas Anual</span>
-								<span className="text-xl md:text-2xl font-bold">€ {annualData[user._id]?.expenses?.toLocaleString('de-DE', { minimumFractionDigits: 2 }) || '0,00'}</span>
+								<span className="text-xl md:text-2xl font-bold">{!showValues ? '•••' : `€ ${annualData[user._id]?.expenses?.toLocaleString('de-DE', { minimumFractionDigits: 2 }) || '0,00'}`}</span>
 							</div>
 							<div className="bg-gradient-to-r from-green-500 to-green-600 p-2 md:p-4 rounded-lg text-white shadow flex flex-col justify-between min-h-[40px] md:min-h-[80px]">
 								<span className="text-base md:text-lg font-semibold mb-1 md:mb-2">Saldo Anual</span>
-								<span className="text-xl md:text-2xl font-bold">€ {annualData[user._id]?.saldo?.toLocaleString('de-DE', { minimumFractionDigits: 2 }) || '0,00'}</span>
+								<span className="text-xl md:text-2xl font-bold">{!showValues ? '•••' : `€ ${annualData[user._id]?.saldo?.toLocaleString('de-DE', { minimumFractionDigits: 2 }) || '0,00'}`}</span>
 							</div>
 						</div>
 					</div>
