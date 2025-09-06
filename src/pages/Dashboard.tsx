@@ -253,15 +253,15 @@ const Dashboard: React.FC = () => {
       {/* Header */}
       <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center mb-4">
-          <div className="flex items-center">
+          <div className="flex items-center min-w-0">
             <button className="md:hidden mr-3" onClick={() => setMobileMenuOpen(true)} aria-label="Abrir menu">
               <FaBars className="h-6 w-6 text-gray-700 dark:text-gray-200" />
             </button>
-            <FaWallet className="h-8 w-8 text-primary-600" />
-            <div className="ml-3 flex flex-col">
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-white">JS FinanceApp</h1>
+            <FaWallet className="h-8 w-8 text-primary-600 shrink-0" />
+            <div className="ml-3 flex flex-col min-w-0">
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-white truncate">JS FinanceApp</h1>
               {currentUser?.name && (
-                <span className="text-sm text-gray-600 dark:text-gray-300 font-normal">Bem-vindo, {currentUser.name}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300 font-normal truncate">Bem-vindo, {currentUser.name}</span>
               )}
             </div>
           </div>
@@ -272,8 +272,7 @@ const Dashboard: React.FC = () => {
             <button onClick={() => setShowValues(!showValues)} title={showValues ? 'Ocultar valores' : 'Mostrar valores'}>
               {showValues ? <FaEye className="h-5 w-5" /> : <FaEyeSlash className="h-5 w-5" />}
             </button>
-            <button onClick={handleLogout} className="text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400">Sair</button>
-            <FaUserCircle className="h-8 w-8 text-gray-400 ml-2" />
+            <button onClick={handleLogout} className="px-4 py-2 rounded-lg font-semibold bg-red-600 text-white hover:bg-red-700 shadow transition-colors duration-200">Sair</button>
           </div>
         </div>
       </header>
