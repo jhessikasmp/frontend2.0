@@ -6,6 +6,7 @@ import { useValueVisibility } from '../context/ValueVisibilityContext';
 
 import { safeGetFromStorage } from '../utils/storage';
 import { getCurrentMonthTotalExpensesWithEntries } from '../services/getCurrentMonthTotalExpensesWithEntries';
+// Reverted: previous summary-based import removed to restore old visuals
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const Dashboard: React.FC = () => {
@@ -43,6 +44,7 @@ const Dashboard: React.FC = () => {
   const [showSalaryForm, setShowSalaryForm] = useState(false);
   const [expenseTotal, setExpenseTotal] = useState<number | null>(null);
   const [expenseLoading, setExpenseLoading] = useState(false);
+  // Reverted: remove summary-driven state to restore previous layout
   // --- Lembretes ---
   const [reminders, setReminders] = useState<any[]>([]);
   const [reminderLoading, setReminderLoading] = useState(false);
@@ -154,6 +156,8 @@ const Dashboard: React.FC = () => {
       setExpenseLoading(false);
     }
   };
+
+  // Removed summary fetch to revert visuals
 
   // Buscar salário total do mês de todos os usuários ao carregar
   useEffect(() => {
@@ -368,31 +372,28 @@ const Dashboard: React.FC = () => {
               </div>
             )}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+            {/* Salário - simples em Euro */}
             <div className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-800 dark:to-blue-900 p-4 rounded-lg text-white shadow-lg flex flex-col justify-between min-h-[80px]">
-              <h3 className="flex items-center text-sm font-semibold"><FaMoneyBillWave className="mr-1"/> Salário do Mes (Todos Usuários)</h3>
+              <h3 className="flex items-center text-sm font-semibold"><FaMoneyBillWave className="mr-1"/> Salário do Mês (Todos Usuários)</h3>
               <p className="mt-2 text-2xl font-bold">{!showValues ? '•••' : salaryLoading ? '...' : salaryTotal !== null ? `€ ${salaryTotal.toLocaleString('de-DE', { minimumFractionDigits: 2 })}` : 'Não informado'}</p>
             </div>
+
+            {/* Despesas - simples em Euro */}
             <div className="bg-gradient-to-r from-red-500 to-red-600 dark:from-red-700 dark:to-red-900 p-4 rounded-lg text-white shadow-lg flex flex-col justify-between min-h-[80px]">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="flex items-center text-sm font-semibold"><FaWallet className="mr-1"/> Despesas do Mes</h3>
-                  <p className="mt-2 text-2xl font-bold">{!showValues ? '•••' : expenseLoading ? '...' : expenseTotal !== null ? `€ ${expenseTotal.toLocaleString('de-DE', { minimumFractionDigits: 2 })}` : 'Não informado'}</p>
-                </div>
-              </div>
+              <h3 className="flex items-center text-sm font-semibold"><FaWallet className="mr-1"/> Despesas do Mês</h3>
+              <p className="text-2xl font-bold mt-2">{!showValues ? '•••' : expenseLoading ? '...' : expenseTotal !== null ? `€ ${expenseTotal.toLocaleString('de-DE', { minimumFractionDigits: 2 })}` : 'Não informado'}</p>
             </div>
+
+            {/* Saldo - calculado em Euro */}
             <div className="bg-gradient-to-r from-green-500 to-green-600 dark:from-green-700 dark:to-green-900 p-4 rounded-lg text-white shadow-lg flex flex-col justify-between min-h-[80px]">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="flex items-center text-sm font-semibold"><FaPiggyBank className="mr-1"/> Saldo do Mes</h3>
-                  <p className="mt-2 text-2xl font-bold">
-                    {!showValues ? '•••' : salaryLoading || expenseLoading ? '...' :
-                      (salaryTotal !== null && expenseTotal !== null)
-                        ? `€ ${(salaryTotal - expenseTotal).toLocaleString('de-DE', { minimumFractionDigits: 2 })}`
-                        : 'Não informado'}
-                  </p>
-                </div>
-              </div>
+              <h3 className="flex items-center text-sm font-semibold"><FaPiggyBank className="mr-1"/> Saldo do Mês</h3>
+              <p className="mt-2 text-2xl font-bold">
+                {!showValues ? '•••' : salaryLoading || expenseLoading ? '...' :
+                  (salaryTotal !== null && expenseTotal !== null)
+                    ? `€ ${(salaryTotal - expenseTotal).toLocaleString('de-DE', { minimumFractionDigits: 2 })}`
+                    : 'Não informado'}
+              </p>
             </div>
           </div>
 

@@ -33,7 +33,6 @@ const Viagem: React.FC = () => {
     getViagemEntriesYear('', year).then((entries: any[]) => {
       const total = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
       setEntradasAnual(total);
-      setSaldoFundo(total - totalDespesas);
     });
     getTotalViagemEntries().then(total => {
       setEntradasTotal(total);
@@ -43,12 +42,11 @@ const Viagem: React.FC = () => {
       setDespesas(arr);
       const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
       setTotalDespesas(total);
-      setSaldoFundo(entradasAnual - total);
     });
   }, []);
 
   useEffect(() => {
-    setSaldoFundo(entradasAnual - totalDespesas);
+    setSaldoFundo((entradasAnual || 0) - (totalDespesas || 0));
   }, [entradasAnual, totalDespesas]);
 
   return (
@@ -97,9 +95,8 @@ const Viagem: React.FC = () => {
               const { addViagemEntry } = await import('../services/addViagemEntry');
               await addViagemEntry(userId, valor);
               setEntradaValor('');
-              // Atualiza os cards após adicionar
-              const year = new Date().getFullYear();
               // Atualiza os cards após adicionar (global)
+              const year = new Date().getFullYear();
               getViagemEntriesYear('', year).then((entries: any[]) => {
                 const total = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
                 setEntradasAnual(total);
@@ -132,7 +129,6 @@ const Viagem: React.FC = () => {
           if (!nomeInput || valorInput <= 0 || !dataInput) return;
           const { addViagemExpense } = await import('../services/addViagemExpense');
           await addViagemExpense(userId, nomeInput, valorInput, dataInput);
-          // Atualiza os cards após adicionar
           // Atualiza os cards após adicionar despesa (global)
           getAllViagemExpenses().then((arr: any[]) => {
             setDespesas(arr);

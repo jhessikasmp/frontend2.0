@@ -50,8 +50,9 @@ const Carro: React.FC = () => {
 	}, [userId]);
 
 	useEffect(() => {
-		setSaldoFundo(entradasTotal - totalDespesas);
-	}, [entradasTotal, totalDespesas]);
+		// Saldo do fundo = Entradas Anual (card) - Total de Despesas
+		setSaldoFundo((entradasAnual || 0) - (totalDespesas || 0));
+	}, [entradasAnual, totalDespesas]);
 
 	return (
 		<main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
@@ -99,7 +100,7 @@ const Carro: React.FC = () => {
 						const { addCarroEntry } = await import('../services/addCarroEntry');
 						await addCarroEntry(userId, valor);
 						setEntradaValor('');
-						// Atualiza os cards após adicionar
+						// Atualiza os cards após adicionar (recalcula anual e despesas; saldo é derivado)
 						const year = new Date().getFullYear();
 						getCarroEntriesYear(userId, year).then((entries: any[]) => {
 							const total = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
@@ -132,7 +133,7 @@ const Carro: React.FC = () => {
 							if (!despesaNome || Number(despesaValor) <= 0 || !despesaData) return;
 							const { addCarroExpense } = await import('../services/addCarroExpense');
 							await addCarroExpense(userId, despesaNome, Number(despesaValor), despesaData);
-							// Atualiza os cards após adicionar
+							// Atualiza os cards após adicionar (recalcula despesas e anual; saldo é derivado)
 							getCarroExpensesTotal(userId).then((total: number) => {
 								setTotalDespesas(total);
 							});

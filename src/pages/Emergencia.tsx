@@ -28,22 +28,26 @@ const Emergencia: React.FC = () => {
 	const [showEntradaForm, setShowEntradaForm] = useState(false);
 
 	useEffect(() => {
+		const year = new Date().getFullYear();
+		// Entradas anual (para exibição "Ano atual")
+		getEmergencyEntriesYear('', year).then(entries => {
+			const totalYear = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
+			setEntradasAnual(totalYear);
+		});
 		// Montante total de entradas (global)
 		getTotalEmergencyEntries().then(total => {
 			setEntradasTotal(total);
-			setSaldoFundo(total - totalDespesas);
 		});
 		// Total de despesas e histórico (global)
 		getAllEmergencyExpenses().then(arr => {
 			setDespesas(arr);
 			const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
 			setTotalDespesas(total);
-			setSaldoFundo(entradasTotal - total);
 		});
 	}, []);
 
 	useEffect(() => {
-		setSaldoFundo(entradasTotal - totalDespesas);
+		setSaldoFundo((entradasTotal || 0) - (totalDespesas || 0));
 	}, [entradasTotal, totalDespesas]);
 
 	return (
@@ -93,17 +97,17 @@ const Emergencia: React.FC = () => {
 													const { addEmergencyEntry } = await import('../services/addEmergencyEntry');
 													await addEmergencyEntry(userId, valor);
 													setEntradaValor('');
-													// Atualiza os cards após adicionar (global)
-													const year = new Date().getFullYear();
-													getEmergencyEntriesYear('', year).then(entries => {
-														const total = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
-														setEntradasAnual(total);
+													// Atualiza: anual, total global e despesas; saldo é derivado via useEffect
+													const currentYear = new Date().getFullYear();
+													getEmergencyEntriesYear('', currentYear).then(entries => {
+														const totalYear = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
+														setEntradasAnual(totalYear);
 													});
+													getTotalEmergencyEntries().then(total => setEntradasTotal(total));
 													getAllEmergencyExpenses().then(arr => {
 														setDespesas(arr);
 														const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
 														setTotalDespesas(total);
-														setSaldoFundo(entradasAnual - total);
 													});
 												}}>
 													<input type="number" placeholder="Valor da Entrada (em Euro)" className="input w-full" value={entradaValor} onChange={e => setEntradaValor(e.target.value)} min={0} step={0.01} required />
@@ -130,16 +134,16 @@ const Emergencia: React.FC = () => {
 								await addEmergencyExpense(userId, nomeInput, valorInput, dataInput);
 								// Atualiza os cards após adicionar (global)
 								const year = new Date().getFullYear();
-								getEmergencyEntriesYear('', year).then(entries => {
-									const total = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
-									setEntradasAnual(total);
-								});
-								getAllEmergencyExpenses().then(arr => {
-									setDespesas(arr);
-									const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
-									setTotalDespesas(total);
-									setSaldoFundo(entradasAnual - total);
-								});
+									getEmergencyEntriesYear('', year).then(entries => {
+										const totalYear = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
+										setEntradasAnual(totalYear);
+									});
+									getAllEmergencyExpenses().then(arr => {
+										setDespesas(arr);
+										const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
+										setTotalDespesas(total);
+									});
+									getTotalEmergencyEntries().then(total => setEntradasTotal(total));
 								// Limpa os campos
 								(e.currentTarget.elements[0] as HTMLInputElement).value = '';
 								(e.currentTarget.elements[1] as HTMLInputElement).value = '';

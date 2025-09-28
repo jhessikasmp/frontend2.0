@@ -34,11 +34,9 @@ const Mesada: React.FC = () => {
 		getMesadaEntriesYear(userId, year).then((entries: any[]) => {
 			const total = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
 			setEntradasAnual(total);
-			setSaldoFundo(total - totalDespesas);
 		});
 		getMesadaExpensesTotal(userId).then((total: number) => {
 			setTotalDespesas(total);
-			setSaldoFundo(entradasAnual - total);
 		});
 		// Buscar histórico de despesas
 		import('../services/getMesadaExpenses').then(({ getMesadaExpenses }) => {
@@ -47,7 +45,7 @@ const Mesada: React.FC = () => {
 	}, [userId]);
 
 	useEffect(() => {
-		setSaldoFundo(entradasAnual - totalDespesas);
+		setSaldoFundo((entradasAnual || 0) - (totalDespesas || 0));
 	}, [entradasAnual, totalDespesas]);
 
 	return (
@@ -94,7 +92,7 @@ const Mesada: React.FC = () => {
 						const { addMesadaEntry } = await import('../services/addMesadaEntry');
 						await addMesadaEntry(userId, valor);
 						setEntradaValor('');
-						// Atualiza os cards após adicionar
+						// Atualiza os cards após adicionar (recalcula anual e despesas; saldo é derivado)
 						const year = new Date().getFullYear();
 						getMesadaEntriesYear(userId, year).then((entries: any[]) => {
 							const total = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
@@ -127,7 +125,7 @@ const Mesada: React.FC = () => {
 					if (!despesaNome || Number(despesaValor) <= 0 || !despesaData) return;
 					const { addMesadaExpense } = await import('../services/addMesadaExpense');
 					await addMesadaExpense(userId, despesaNome, Number(despesaValor), despesaData);
-					// Atualiza os cards após adicionar
+					// Atualiza os cards após adicionar (recalcula despesas e anual; saldo é derivado)
 					getMesadaExpensesTotal(userId).then((total: number) => {
 						setTotalDespesas(total);
 					});

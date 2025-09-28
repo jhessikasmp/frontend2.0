@@ -1,11 +1,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { useValueVisibility } from '../context/ValueVisibilityContext';
-import { FaPiggyBank, FaEuroSign, FaChartLine } from 'react-icons/fa';
+import { FaPiggyBank, FaEuroSign, FaChartLine, FaPercentage } from 'react-icons/fa';
 import { getInvestmentEntriesYear } from '../services/investmentEntryService';
 import { getTotalInvestmentEntries } from '../services/getTotalInvestmentEntries';
 import { getAllInvestments } from '../services/getAllInvestments';
-import { toEuro } from '../utils/currency';
+import { toEuro, toBRL } from '../utils/currency';
 import { addInvestmentEntry } from '../services/addInvestmentEntry';
 import { addInvestment } from '../services/addInvestment';
 
@@ -22,7 +22,8 @@ const Investimento: React.FC = () => {
 	const { showValues } = useValueVisibility();
 		const [entradasAnoEuro, setEntradasAnoEuro] = useState(0);
 		const [entradasTotal, setEntradasTotal] = useState(0);
-		const [totalAtivosEuro, setTotalAtivosEuro] = useState(0);
+	const [totalAtivosEuro, setTotalAtivosEuro] = useState(0);
+	const [totalAtivosBRL, setTotalAtivosBRL] = useState(0);
 		const [entradaValor, setEntradaValor] = useState('');
 		const [ativoNome, setAtivoNome] = useState('');
 		const [ativoValor, setAtivoValor] = useState('');
@@ -44,6 +45,101 @@ const Investimento: React.FC = () => {
 		})();
 		const [showEntradaForm, setShowEntradaForm] = useState(false);
 
+		// ——— Lembrete de porcentagem anual (local, apenas para referência) ———
+	interface YearlyReturn { year: number; percent: number }
+	const [yearlyReturns, setYearlyReturns] = useState<YearlyReturn[]>([]);
+		const [yrYear, setYrYear] = useState<string>('');
+		const [yrPercent, setYrPercent] = useState<string>('');
+		const [showYrForm, setShowYrForm] = useState<boolean>(false);
+	const [yrLoading, setYrLoading] = useState<boolean>(false);
+	const [yrError, setYrError] = useState<string | null>(null);
+	const STORAGE_KEY_FALLBACK = 'investmentYearlyReturns';
+	const [yrInfo, setYrInfo] = useState<string | null>(null);
+
+		useEffect(() => {
+			let active = true;
+			(async () => {
+				setYrLoading(true);
+				setYrError(null);
+				try {
+					const data = await (await import('../services/investmentAnnualReturns')).listInvestmentReturns();
+					if (active) setYearlyReturns(data.map(d => ({ year: d.year, percent: d.percent })));
+				} catch (e) {
+					// Fallback silencioso: usa localStorage para não travar a UI
+					try {
+						const raw = localStorage.getItem(STORAGE_KEY_FALLBACK);
+						const parsed = raw ? JSON.parse(raw) : [];
+						if (active && Array.isArray(parsed)) {
+							setYearlyReturns(parsed);
+							setYrInfo('Exibindo dados locais.');
+						} else if (active) {
+							setYrInfo('');
+						}
+					} catch {
+						if (active) setYrError('Não foi possível carregar lucros anuais.');
+					}
+				} finally {
+					if (active) setYrLoading(false);
+				}
+			})();
+			return () => { active = false; };
+		}, []);
+
+		const addYearlyReturn = async (e: React.FormEvent) => {
+			e.preventDefault();
+			const yearNum = Number(yrYear);
+			const percentNum = Number(yrPercent);
+			if (!Number.isFinite(yearNum) || !Number.isFinite(percentNum)) return;
+			if (yearNum < 2000 || yearNum > 2100) return;
+			if (percentNum < -100 || percentNum > 1000) return;
+			try {
+				setYrLoading(true);
+				setYrError(null);
+				const svc = await import('../services/investmentAnnualReturns');
+				await svc.upsertInvestmentReturn(yearNum, percentNum);
+				const data = await svc.listInvestmentReturns();
+				setYearlyReturns(data.map(d => ({ year: d.year, percent: d.percent })));
+				setYrYear(''); setYrPercent('');
+				setYrInfo(null);
+			} catch (e) {
+				// Fallback: salva localmente para não perder o dado
+				try {
+					const current = Array.isArray(yearlyReturns) ? [...yearlyReturns] : [];
+					const idx = current.findIndex(r => r.year === yearNum);
+					if (idx >= 0) current[idx] = { year: yearNum, percent: percentNum };
+					else current.push({ year: yearNum, percent: percentNum });
+					current.sort((a,b) => b.year - a.year);
+					setYearlyReturns(current);
+					try { localStorage.setItem(STORAGE_KEY_FALLBACK, JSON.stringify(current)); } catch {}
+					setYrInfo('Salvo localmente (backend indisponível).');
+				} catch {
+					setYrError('Não foi possível salvar.');
+				}
+			} finally {
+				setYrLoading(false);
+			}
+		};
+
+		const removeYearlyReturn = async (year: number) => {
+			try {
+				setYrLoading(true);
+				setYrError(null);
+				const svc = await import('../services/investmentAnnualReturns');
+				await svc.deleteInvestmentReturn(year);
+				const data = await svc.listInvestmentReturns();
+				setYearlyReturns(data.map(d => ({ year: d.year, percent: d.percent })));
+				setYrInfo(null);
+			} catch (e) {
+				// Fallback: remove localmente
+				const next = yearlyReturns.filter(r => r.year !== year);
+				setYearlyReturns(next);
+				try { localStorage.setItem(STORAGE_KEY_FALLBACK, JSON.stringify(next)); } catch {}
+				setYrInfo('Removido localmente (backend indisponível).');
+			} finally {
+				setYrLoading(false);
+			}
+		};
+
 		const atualizarDados = () => {
 			const year = new Date().getFullYear();
 			getInvestmentEntriesYear(year).then(entries => {
@@ -54,15 +150,19 @@ const Investimento: React.FC = () => {
 				setEntradasTotal(total);
 			});
 			getAllInvestments().then(investments => {
-				setAtivos(investments);
-				let brl = 0, usd = 0, eur = 0;
-				investments.forEach((inv: any) => {
-					if (inv.moeda === 'Real') brl += inv.valor;
-					else if (inv.moeda === 'Dolar') usd += inv.valor;
-					else if (inv.moeda === 'Euro') eur += inv.valor;
-				});
-				const totalEuro = investments.reduce((sum: number, inv: any) => sum + toEuro(inv.valor, inv.moeda), 0);
+				setAtivos(investments || []);
+				const totalEuro = (investments || []).reduce((sum: number, inv: any) => {
+					const val = Number(inv?.valor) || 0;
+					const cur = String(inv?.moeda || '');
+					return sum + toEuro(val, cur);
+				}, 0);
 				setTotalAtivosEuro(totalEuro);
+				const totalBrl = (investments || []).reduce((sum: number, inv: any) => {
+					const val = Number(inv?.valor) || 0;
+					const cur = String(inv?.moeda || '');
+					return sum + toBRL(val, cur);
+				}, 0);
+				setTotalAtivosBRL(totalBrl);
 			});
 		};
 
@@ -112,13 +212,20 @@ const Investimento: React.FC = () => {
 									  <span className="text-lg md:text-xl font-semibold block mb-1">Ano atual: {!showValues ? '•••' : entradasAnoEuro.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
 									  <span className="text-lg md:text-xl font-semibold block">Total global: {!showValues ? '•••' : entradasTotal.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
 								</div>
-								<div className={`${cardBase} ${cardGradients[1]}`}> 
+																<div className={`${cardBase} ${cardGradients[1]}`}> 
 									<div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
 										<FaPiggyBank className="text-2xl md:text-3xl opacity-80" />
 										<span className="text-base md:text-lg font-semibold">Total de Ativos</span>
 									</div>
 									  <span className="text-2xl md:text-3xl font-bold">{!showValues ? '•••' : totalAtivosEuro.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
-									  <span className="block text-xs mt-1 md:mt-2 text-white/80">{!showValues ? '' : totalAtivosEuro > 0 && <span>Total em EUR: {totalAtivosEuro.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>}</span>
+																			<span className="block text-xs mt-1 md:mt-2 text-white/80">
+																				{!showValues ? '' : totalAtivosEuro > 0 && (
+																					<span>
+																						Total em EUR: {totalAtivosEuro.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
+																						{' '}• Total em BRL: {totalAtivosBRL.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+																					</span>
+																				)}
+																			</span>
 								</div>
 								<div className={`${cardBase} ${cardGradients[2]}`}> 
 									<div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
@@ -127,6 +234,48 @@ const Investimento: React.FC = () => {
 									</div>
 									  <span className="text-2xl md:text-3xl font-bold text-yellow-800 dark:text-yellow-200">{!showValues ? '•••' : Math.abs(entradasTotal - totalAtivosEuro).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
 								</div>
+							</div>
+
+							{/* Cards pequenos: % de lucros por ano (manual) - discreto */}
+							<div className="w-full mb-6">
+								<details className="rounded-md border border-transparent">
+									<summary className="cursor-pointer select-none text-sm text-zinc-600 dark:text-zinc-300 flex items-center gap-2">
+										<FaPercentage className="opacity-70" /> Lucros por ano (manual)
+										<span className="text-xs text-zinc-400">discreto</span>
+									</summary>
+									<div className="mt-3">
+										<div className="flex items-center gap-2 mb-2">
+											<button type="button" className="text-xs text-primary-600 dark:text-primary-400 hover:underline" onClick={() => setShowYrForm(v => !v)}>
+												{showYrForm ? 'Fechar' : 'Adicionar'}
+											</button>
+										</div>
+										{showYrForm && (
+											<form onSubmit={addYearlyReturn} className="flex flex-wrap items-center gap-2 mb-3">
+												<input type="number" min={2000} max={2100} placeholder="Ano" className="input h-8 text-xs w-24" value={yrYear} onChange={e=>setYrYear(e.target.value)} required />
+												<input type="number" min={-100} max={1000} step={0.1} placeholder="%" className="input h-8 text-xs w-20" value={yrPercent} onChange={e=>setYrPercent(e.target.value)} required />
+												<button type="submit" className="h-8 px-3 rounded-md text-xs bg-primary-600 text-white hover:bg-primary-700">Salvar</button>
+											</form>
+										)}
+										{yrLoading && <div className="text-xs text-zinc-400">Carregando…</div>}
+										{yrError && <div className="text-xs text-red-500">{yrError}</div>}
+										{yrInfo && !yrError && <div className="text-xs text-zinc-500">{yrInfo}</div>}
+										{yearlyReturns.length === 0 ? (
+											<div className="text-xs text-zinc-500">Sem dados adicionados.</div>
+										) : (
+											<div className="flex flex-wrap gap-2">
+												{yearlyReturns.map(r => (
+													<div key={r.year} className="group relative inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200">
+														<span className="font-medium">{r.year}</span>
+														<span className={`${r.percent < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-700 dark:text-green-300'}`}>{showValues ? `${r.percent}%` : '•••'}</span>
+														<button aria-label="Remover" onClick={() => removeYearlyReturn(r.year)} className="ml-1 text-zinc-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition" title="Remover">
+															×
+														</button>
+													</div>
+												))}
+											</div>
+										)}
+									</div>
+								</details>
 							</div>
 												{/* Botão para mostrar formulário de entrada */}
 												<div className="card mb-8 w-full rounded-lg shadow-lg p-4 sm:p-6 mt-8">
