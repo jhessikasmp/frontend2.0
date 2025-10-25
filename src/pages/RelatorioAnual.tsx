@@ -77,29 +77,38 @@ const RelatorioAnual: React.FC = () => {
 		run();
 	}, [year]);
 
-	// Função para download de PDF
-	const downloadPDF = async (url: string, filename: string) => {
-		try {
-			setDownloadLoading(true);
-			
-			const response = await fetch(url);
-			if (!response.ok) {
-				throw new Error(`Erro ${response.status}: ${response.statusText}`);
-			}
+// Removido helper de download não utilizado (substituído por lógicas com fallback nos handlers)
 
-			const blob = await response.blob();
-			const downloadUrl = window.URL.createObjectURL(blob);
-			
+	const handleAnnualDownload = async () => {
+		const filename = `relatorio-anual-${year}.pdf`;
+		setDownloadLoading(true);
+		try {
+			// 1) GET padrão
+			let res = await fetch(`${API_URL}/api/reports/annual/download?year=${year}`);
+			if (!res.ok && (res.status === 404 || res.status === 405)) {
+				// 2) alias GET /annual
+				res = await fetch(`${API_URL}/api/reports/annual?year=${year}`);
+			}
+			if (!res.ok && (res.status === 404 || res.status === 405)) {
+				// 3) fallback POST
+				res = await fetch(`${API_URL}/api/reports/annual/download`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ year })
+				});
+			}
+			if (!res.ok) {
+				throw new Error(`Erro ${res.status}: ${res.statusText}`);
+			}
+			const blob = await res.blob();
+			const url = window.URL.createObjectURL(blob);
 			const link = document.createElement('a');
-			link.href = downloadUrl;
+			link.href = url;
 			link.download = filename;
 			document.body.appendChild(link);
 			link.click();
-			
 			document.body.removeChild(link);
-			window.URL.revokeObjectURL(downloadUrl);
-			
-			console.log(`Download concluído: ${filename}`);
+			window.URL.revokeObjectURL(url);
 		} catch (error) {
 			console.error('Erro no download:', error);
 			alert(`Erro ao baixar relatório: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
@@ -108,13 +117,7 @@ const RelatorioAnual: React.FC = () => {
 		}
 	};
 
-	const handleAnnualDownload = () => {
-		const url = `${API_URL}/api/reports/annual/download?year=${year}`;
-		const filename = `relatorio-anual-${year}.pdf`;
-		downloadPDF(url, filename);
-	};
-
-	const handleCustomPeriodDownload = () => {
+	const handleCustomPeriodDownload = async () => {
 		if (!startDate || !endDate) {
 			alert('Por favor, selecione as datas de início e fim');
 			return;
@@ -130,7 +133,37 @@ const RelatorioAnual: React.FC = () => {
 
 		const url = `${API_URL}/api/reports/custom-period?startDate=${startDate}&endDate=${endDate}`;
 		const filename = `relatorio-periodo-${startDate}-${endDate}.pdf`;
-		downloadPDF(url, filename);
+
+		setDownloadLoading(true);
+		try {
+			// 1) tenta GET (produção deve aceitar GET)
+			let res = await fetch(url);
+			if (!res.ok && (res.status === 404 || res.status === 405)) {
+				// 2) fallback: tenta POST no mesmo endpoint (backend foi ajustado para aceitar POST com body)
+				res = await fetch(`${API_URL}/api/reports/custom-period`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ startDate, endDate })
+				});
+			}
+			if (!res.ok) {
+				throw new Error(`Erro ${res.status}: ${res.statusText}`);
+			}
+			const blob = await res.blob();
+			const downloadUrl = window.URL.createObjectURL(blob);
+			const link = document.createElement('a');
+			link.href = downloadUrl;
+			link.download = filename;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			window.URL.revokeObjectURL(downloadUrl);
+		} catch (error) {
+			console.error('Erro no download:', error);
+			alert(`Erro ao baixar relatório: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+		} finally {
+			setDownloadLoading(false);
+		}
 	};
 
 	return (
