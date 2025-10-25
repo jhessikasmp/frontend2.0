@@ -19,7 +19,6 @@ const Dashboard: React.FC = () => {
     { label: 'Emergência', path: '/dashboard/emergencia', icon: <FaBell className="inline mr-2 text-lg align-middle" /> },
     { label: 'Viagens', path: '/dashboard/viagens', icon: <FaUserCircle className="inline mr-2 text-lg align-middle" /> },
     { label: 'Carro', path: '/dashboard/carro', icon: <FaWallet className="inline mr-2 text-lg align-middle" /> },
-    { label: 'Mesada', path: '/dashboard/mesada', icon: <FaMoneyBillWave className="inline mr-2 text-lg align-middle" /> },
     { label: 'Relatório Anual', path: '/dashboard/relatorio-anual', icon: <FaPiggyBank className="inline mr-2 text-lg align-middle" /> },
   ];
 
