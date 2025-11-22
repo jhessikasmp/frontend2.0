@@ -169,7 +169,7 @@ const Dashboard: React.FC = () => {
   const fetchSalaryTotal = async () => {
     setSalaryLoading(true);
     try {
-  const res = await fetch(`${apiUrl}/api/salary/current-month-total`);
+      const res = await fetch(`${apiUrl}/api/salary/current-month-total`);
       const data = await res.json();
       if (data.success) {
         setSalaryTotal(data.total);

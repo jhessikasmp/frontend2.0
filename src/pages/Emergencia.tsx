@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useValueVisibility } from '../context/ValueVisibilityContext';
-import { FaMoneyBillWave, FaWallet, FaPiggyBank } from 'react-icons/fa';
+import { FaMoneyBillWave, FaWallet, FaPiggyBank, FaTrash } from 'react-icons/fa';
 import { getEmergencyEntriesYear } from '../services/emergencyEntryService';
 import { getTotalEmergencyEntries } from '../services/getTotalEmergencyEntries';
 import { getAllEmergencyExpenses } from '../services/emergencyExpenseService';
@@ -13,6 +13,9 @@ const Emergencia: React.FC = () => {
 	const [entradaValor, setEntradaValor] = useState('');
 	const [entradasTotal, setEntradasTotal] = useState(0);
 	const [despesas, setDespesas] = useState<any[]>([]);
+	const [despesaNome, setDespesaNome] = useState('');
+	const [despesaValor, setDespesaValor] = useState('');
+	const [despesaData, setDespesaData] = useState('');
 	const userId = (() => {
 		try {
 			const raw = localStorage.getItem('currentUser');
@@ -126,36 +129,34 @@ const Emergencia: React.FC = () => {
 							<form className="grid grid-cols-1 gap-4" onSubmit={async e => {
 								e.preventDefault();
 								if (!userId) return;
-								const nomeInput = (e.currentTarget.elements[0] as HTMLInputElement).value;
-								const valorInput = Number((e.currentTarget.elements[1] as HTMLInputElement).value);
-								const dataInput = (e.currentTarget.elements[2] as HTMLInputElement).value;
+								const nomeInput = despesaNome;
+								const valorInput = Number(despesaValor);
+								const dataInput = despesaData;
 								if (!nomeInput || valorInput <= 0 || !dataInput) return;
 								const { addEmergencyExpense } = await import('../services/addEmergencyExpense');
 								await addEmergencyExpense(userId, nomeInput, valorInput, dataInput);
 								// Atualiza os cards após adicionar (global)
 								const year = new Date().getFullYear();
-									getEmergencyEntriesYear('', year).then(entries => {
-										const totalYear = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
-										setEntradasAnual(totalYear);
-									});
-									getAllEmergencyExpenses().then(arr => {
-										setDespesas(arr);
-										const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
-										setTotalDespesas(total);
-									});
-									getTotalEmergencyEntries().then(total => setEntradasTotal(total));
-								// Limpa os campos
-								(e.currentTarget.elements[0] as HTMLInputElement).value = '';
-								(e.currentTarget.elements[1] as HTMLInputElement).value = '';
-								(e.currentTarget.elements[2] as HTMLInputElement).value = '';
+								const entries = await getEmergencyEntriesYear('', year);
+								const totalYear = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
+								setEntradasAnual(totalYear);
+								const arr = await getAllEmergencyExpenses();
+								setDespesas(arr);
+								const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
+								setTotalDespesas(total);
+								getTotalEmergencyEntries().then(total => setEntradasTotal(total));
+								// Limpa os campos controlados
+								setDespesaNome('');
+								setDespesaValor('');
+								setDespesaData('');
 								// Atualiza histórico de despesas
 								import('../services/getEmergencyExpenses').then(({ getEmergencyExpenses }) => {
 									getEmergencyExpenses(userId).then(arr => setDespesas(arr));
 								});
 							}}>
-								<input type="text" placeholder="Nome da Despesa" className="input w-full" required />
-								<input type="number" placeholder="Valor (em Euro)" className="input w-full" min={0} step={0.01} required />
-								<input type="date" className="input w-full" required />
+								<input type="text" placeholder="Nome da Despesa" className="input w-full" value={despesaNome} onChange={e => setDespesaNome(e.target.value)} required />
+								<input type="number" placeholder="Valor (em Euro)" className="input w-full" min={0} step={0.01} value={despesaValor} onChange={e => setDespesaValor(e.target.value)} required />
+								<input type="date" className="input w-full" value={despesaData} onChange={e => setDespesaData(e.target.value)} required />
 								<button type="submit" className="btn-primary mt-2 w-full h-14 rounded-xl text-base">Adicionar Despesa</button>
 							</form>
 				</div>
@@ -176,9 +177,39 @@ const Emergencia: React.FC = () => {
 											<ul className="divide-y divide-zinc-200 dark:divide-zinc-700">
 												{despesas.map((d, i) => (
 													<li key={d._id || i} className="py-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-sm sm:text-base">
-														<span className="font-medium text-gray-900 dark:text-white">{d.nome}</span>
-														<span className="text-sm text-red-600">€ {d.valor.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</span>
-														<span className="text-xs text-zinc-400 ml-2">{new Date(d.data).toLocaleDateString('pt-BR')}</span>
+														<div className="flex items-center gap-3">
+															<span className="font-medium text-gray-900 dark:text-white">{d.nome}</span>
+															<span className="text-xs text-zinc-400">{new Date(d.data).toLocaleDateString('pt-BR')}</span>
+														</div>
+														<div className="flex items-center gap-3">
+															<span className="text-sm text-red-600">€ {d.valor.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</span>
+															<button
+																className="text-zinc-500 hover:text-red-600 p-1"
+																title="Excluir despesa"
+																onClick={async () => {
+																	if (!d._id) return;
+																	if (!confirm('Confirma exclusão desta despesa?')) return;
+																	const { deleteEmergencyExpense } = await import('../services/deleteEmergencyExpense');
+																	try {
+																		await deleteEmergencyExpense(d._id);
+																		// Atualiza histórico e totais
+																		getAllEmergencyExpenses().then(arr => {
+																			setDespesas(arr);
+																			const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
+																			setTotalDespesas(total);
+																		});
+																		const year = new Date().getFullYear();
+																		getEmergencyEntriesYear('', year).then(entries => {
+																			const totalYear = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
+																			setEntradasAnual(totalYear);
+																		});
+																	} catch (err) {
+																		console.error('Erro ao excluir despesa', err);
+																		alert('Erro ao excluir despesa');
+																	}
+																}}
+															><FaTrash /></button>
+														</div>
 													</li>
 												))}
 											</ul>

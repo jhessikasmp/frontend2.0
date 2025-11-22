@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useValueVisibility } from '../context/ValueVisibilityContext';
-import { FaMoneyBillWave, FaWallet, FaPiggyBank } from 'react-icons/fa';
+import { FaMoneyBillWave, FaWallet, FaPiggyBank, FaTrash } from 'react-icons/fa';
 import { getCarroEntriesYear } from '../services/carroEntryService';
 import { getCarroExpensesTotal } from '../services/carroExpenseService';
 import { getTotalCarroEntries } from '../services/getTotalCarroEntries';
@@ -50,9 +50,9 @@ const Carro: React.FC = () => {
 	}, [userId]);
 
 	useEffect(() => {
-		// Saldo do fundo = Entradas Anual (card) - Total de Despesas
-		setSaldoFundo((entradasAnual || 0) - (totalDespesas || 0));
-	}, [entradasAnual, totalDespesas]);
+		// Saldo do fundo = Total global de entradas - Total de Despesas
+		setSaldoFundo((entradasTotal || 0) - (totalDespesas || 0));
+	}, [entradasTotal, totalDespesas]);
 
 	return (
 		<main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
@@ -175,9 +175,33 @@ const Carro: React.FC = () => {
 							<ul className="divide-y divide-zinc-200 dark:divide-zinc-700">
 								{despesas.map((d, i) => (
 									<li key={d._id || i} className="py-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-sm sm:text-base">
-										<span className="font-medium text-gray-900 dark:text-white">{d.nome}</span>
-										<span className="text-sm text-red-600">€ {d.valor.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</span>
-										<span className="text-xs text-zinc-400 ml-2">{new Date(d.data).toLocaleDateString('pt-BR')}</span>
+										<div className="flex items-center gap-3">
+											<span className="font-medium text-gray-900 dark:text-white">{d.nome}</span>
+											<span className="text-xs text-zinc-400">{new Date(d.data).toLocaleDateString('pt-BR')}</span>
+										</div>
+										<div className="flex items-center gap-3">
+											<span className="text-sm text-red-600">€ {d.valor.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</span>
+											<button
+												className="text-zinc-500 hover:text-red-600 p-1"
+												title="Excluir despesa"
+												onClick={async () => {
+													if (!d._id) return;
+													if (!confirm('Confirma exclusão desta despesa?')) return;
+													const { deleteCarroExpense } = await import('../services/deleteCarroExpense');
+													try {
+														await deleteCarroExpense(d._id);
+														// Atualiza histórico e totais
+														getCarroExpensesTotal(userId!).then((total: number) => setTotalDespesas(total));
+														import('../services/getCarroExpenses').then(({ getCarroExpenses }) => {
+															getCarroExpenses(userId!).then(arr => setDespesas(arr));
+														});
+													} catch (err) {
+														console.error('Erro ao excluir despesa', err);
+														alert('Erro ao excluir despesa');
+													}
+												}}
+											><FaTrash /></button>
+										</div>
 									</li>
 								))}
 							</ul>

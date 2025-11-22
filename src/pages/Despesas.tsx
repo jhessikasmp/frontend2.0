@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useValueVisibility } from '../context/ValueVisibilityContext';
 const apiUrl = import.meta.env.VITE_API_URL;
-import { FaWallet } from 'react-icons/fa';
+import { FaWallet, FaTrash } from 'react-icons/fa';
+import { deleteExpense } from '../services/deleteExpense';
 import { safeGetFromStorage } from '../utils/storage';
 
 
@@ -22,6 +23,7 @@ const categorias = [
 ];
 
 interface Despesa {
+	id?: string;
 	nome: string;
 	valor: number;
 	categoria: string;
@@ -48,6 +50,7 @@ const Despesas: React.FC = () => {
 			const data = await res.json();
 			if (data.success && Array.isArray(data.data)) {
 				const despesasArr = data.data.map((d: any): Despesa => ({
+					id: d._id,
 					nome: d.name,
 					valor: d.value,
 					categoria: d.category,
@@ -207,7 +210,7 @@ const Despesas: React.FC = () => {
 				</button>
 				{showCurrent && (
 					<div className="mt-2">
-						{despesas.filter(d => {
+							{despesas.filter(d => {
 							const now = new Date();
 							const m = now.getMonth();
 							const y = now.getFullYear();
@@ -239,16 +242,33 @@ const Despesas: React.FC = () => {
 									dateObj = { year: jsDate.getFullYear(), month: jsDate.getMonth() };
 								}
 								return dateObj.year === y && dateObj.month === m;
-							}).map((d, i) => (
-								<li key={i} className="bg-gray-50 dark:bg-gray-700 rounded p-3 flex justify-between items-center">
-									<div>
-										<div className="font-medium">{d.nome}</div>
-										<div className="text-xs text-gray-500">{d.categoria} | {d.data} | <span className="text-blue-600">{d.usuario}</span></div>
-										{d.descricao && <div className="text-xs text-gray-400 mt-1">{d.descricao}</div>}
-									</div>
-									  <div className="font-bold text-red-600">{!showValues ? '•••' : `€ ${d.valor.toLocaleString('de-DE', { minimumFractionDigits: 2 })}`}</div>
-								</li>
-							))}
+																}).map((d, i) => (
+																<li key={d.id || i} className="bg-gray-50 dark:bg-gray-700 rounded p-3 flex justify-between items-center">
+																		<div>
+																				<div className="font-medium">{d.nome}</div>
+																				<div className="text-xs text-gray-500">{d.categoria} | {d.data} | <span className="text-blue-600">{d.usuario}</span></div>
+																				{d.descricao && <div className="text-xs text-gray-400 mt-1">{d.descricao}</div>}
+																		</div>
+																		<div className="flex items-center gap-3">
+																			<div className="font-bold text-red-600">{!showValues ? '•••' : `€ ${d.valor.toLocaleString('de-DE', { minimumFractionDigits: 2 })}`}</div>
+																			<button
+																				className="text-zinc-500 hover:text-red-600 p-1"
+																				title="Excluir despesa"
+																				onClick={async () => {
+																					if (!d.id) return;
+																					if (!confirm('Confirma exclusão desta despesa?')) return;
+																					try {
+																						await deleteExpense(d.id);
+																						await fetchAllDespesas();
+																					} catch (err) {
+																						console.error('Erro ao excluir despesa', err);
+																						alert('Erro ao excluir despesa');
+																					}
+																				}}
+																			><FaTrash /></button>
+																		</div>
+																</li>
+														))}
 						</ul>
 					</div>
 				)}
