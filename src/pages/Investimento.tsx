@@ -20,8 +20,8 @@ const cardGradients = [
 
 const Investimento: React.FC = () => {
 	const { showValues } = useValueVisibility();
-		const [entradasAnoEuro, setEntradasAnoEuro] = useState(0);
-		const [entradasTotal, setEntradasTotal] = useState(0);
+	const [entradasAnoEuro, setEntradasAnoEuro] = useState(0);
+	const [entradasTotal, setEntradasTotal] = useState(0);
 	const [totalAtivosEuro, setTotalAtivosEuro] = useState(0);
 	const [totalAtivosBRL, setTotalAtivosBRL] = useState(0);
 		const [entradaValor, setEntradaValor] = useState('');
@@ -217,15 +217,13 @@ const Investimento: React.FC = () => {
 										<FaPiggyBank className="text-2xl md:text-3xl opacity-80" />
 										<span className="text-base md:text-lg font-semibold">Total de Ativos</span>
 									</div>
-									  <span className="text-2xl md:text-3xl font-bold">{!showValues ? '•••' : totalAtivosEuro.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
-																			<span className="block text-xs mt-1 md:mt-2 text-white/80">
-																				{!showValues ? '' : totalAtivosEuro > 0 && (
-																					<span>
-																						Total em EUR: {totalAtivosEuro.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
-																						{' '}• Total em BRL: {totalAtivosBRL.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-																					</span>
-																				)}
-																			</span>
+																			<span className="text-2xl md:text-3xl font-bold">{!showValues ? '•••' : totalAtivosEuro.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
+																			{showValues && totalAtivosEuro > 0 && (
+																				<div className="flex items-center gap-4 text-xs mt-1 md:mt-2 text-white/80">
+																					<span>EUR: {totalAtivosEuro.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
+																					<span>BRL: {totalAtivosBRL.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+																				</div>
+																			)}
 								</div>
 								<div className={`${cardBase} ${cardGradients[2]}`}> 
 									<div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">

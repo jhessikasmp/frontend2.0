@@ -49,8 +49,8 @@ const Viagem: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    setSaldoFundo((entradasAnual || 0) - (totalDespesas || 0));
-  }, [entradasAnual, totalDespesas]);
+    setSaldoFundo((entradasTotal || 0) - (totalDespesas || 0));
+  }, [entradasTotal, totalDespesas]);
 
   return (
     <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
@@ -104,6 +104,9 @@ const Viagem: React.FC = () => {
                 const total = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
                 setEntradasAnual(total);
               });
+              getTotalViagemEntries().then(total => {
+                setEntradasTotal(total);
+              });
               getAllViagemExpenses().then((arr: any[]) => {
                 setDespesas(arr);
                 const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
@@ -153,62 +156,81 @@ const Viagem: React.FC = () => {
         </form>
       </div>
 
-      {/* Histórico de Despesas - acordeon */}
+      {/* Histórico de Despesas por Ano - acordeon */}
       <div className="w-full mt-10 px-2 sm:px-0">
-        <details className="rounded-lg shadow-sm" open>
-          <summary className="cursor-pointer px-2 sm:px-4 py-3 font-semibold text-base sm:text-lg select-none flex items-center justify-between">
-            <span className="flex items-center gap-2">
-              Histórico de Despesas
-              <svg className="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-            </span>
-            <span className="text-xs text-zinc-400">{despesas.length} despesas</span>
-          </summary>
-          <div className="px-2 sm:px-4 pb-4">
-            {despesas.length === 0 ? (
-              <div className="text-zinc-500 italic">Nenhuma despesa cadastrada.</div>
-            ) : (
-              <ul className="divide-y divide-zinc-200 dark:divide-zinc-700">
-                {despesas.map((d, i) => (
-                  <li key={d._id || i} className="py-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-sm sm:text-base">
-                    <div className="flex items-center gap-3">
-                      <span className="font-medium text-gray-900 dark:text-white">{d.nome}</span>
-                      <span className="text-xs text-zinc-400">{new Date(d.data).toLocaleDateString('pt-BR')}</span>
+        {despesas.length === 0 ? (
+          <div className="rounded-lg shadow-sm p-4 text-zinc-500 italic">Nenhuma despesa cadastrada.</div>
+        ) : (
+          (() => {
+            const porAno: Record<string, any[]> = {};
+            for (const d of despesas) {
+              const ano = new Date(d.data).getFullYear().toString();
+              if (!porAno[ano]) porAno[ano] = [];
+              porAno[ano].push(d);
+            }
+            const anos = Object.keys(porAno).sort((a, b) => Number(b) - Number(a));
+            const anoAtual = new Date().getFullYear().toString();
+            return (
+              <div className="space-y-3">
+                {anos.map((ano) => (
+                  <details key={ano} className="rounded-lg shadow-sm" open={ano === anoAtual}>
+                    <summary className="cursor-pointer px-2 sm:px-4 py-3 font-semibold text-base sm:text-lg select-none flex items-center justify-between">
+                      <span className="flex items-center gap-2">
+                        Despesas {ano}
+                        <svg className="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                      </span>
+                      <span className="text-xs text-zinc-400">{porAno[ano].length} despesas</span>
+                    </summary>
+                    <div className="px-2 sm:px-4 pb-4">
+                      <ul className="divide-y divide-zinc-200 dark:divide-zinc-700">
+                        {porAno[ano]
+                          .slice()
+                          .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
+                          .map((d, i) => (
+                            <li key={d._id || i} className="py-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-sm sm:text-base">
+                              <div className="flex items-center gap-3">
+                                <span className="font-medium text-gray-900 dark:text-white">{d.nome}</span>
+                                <span className="text-xs text-zinc-400">{new Date(d.data).toLocaleDateString('pt-BR')}</span>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <span className="text-sm text-red-600">{!showValues ? '•••' : `€ ${Number(d.valor).toLocaleString('de-DE', { minimumFractionDigits: 2 })}`}</span>
+                                <button
+                                  className="text-zinc-500 hover:text-red-600 p-1"
+                                  title="Excluir despesa"
+                                  onClick={async () => {
+                                    if (!d._id) return;
+                                    if (!confirm('Confirma exclusão desta despesa?')) return;
+                                    const { deleteViagemExpense } = await import('../services/deleteViagemExpense');
+                                    try {
+                                      await deleteViagemExpense(d._id);
+                                      // Atualiza histórico e totais
+                                      getAllViagemExpenses().then((arr: any[]) => {
+                                        setDespesas(arr);
+                                        const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
+                                        setTotalDespesas(total);
+                                      });
+                                      const year = new Date().getFullYear();
+                                      getViagemEntriesYear('', year).then((entries: any[]) => {
+                                        const total = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
+                                        setEntradasAnual(total);
+                                      });
+                                    } catch (err) {
+                                      console.error('Erro ao excluir despesa', err);
+                                      alert('Erro ao excluir despesa');
+                                    }
+                                  }}
+                                ><FaTrash /></button>
+                              </div>
+                            </li>
+                          ))}
+                      </ul>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-red-600">{!showValues ? '•••' : `€ ${d.valor.toLocaleString('de-DE', { minimumFractionDigits: 2 })}`}</span>
-                      <button
-                        className="text-zinc-500 hover:text-red-600 p-1"
-                        title="Excluir despesa"
-                        onClick={async () => {
-                          if (!d._id) return;
-                          if (!confirm('Confirma exclusão desta despesa?')) return;
-                          const { deleteViagemExpense } = await import('../services/deleteViagemExpense');
-                          try {
-                            await deleteViagemExpense(d._id);
-                            // Atualiza histórico e totais
-                            getAllViagemExpenses().then((arr: any[]) => {
-                              setDespesas(arr);
-                              const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
-                              setTotalDespesas(total);
-                            });
-                            const year = new Date().getFullYear();
-                            getViagemEntriesYear('', year).then((entries: any[]) => {
-                              const total = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
-                              setEntradasAnual(total);
-                            });
-                          } catch (err) {
-                            console.error('Erro ao excluir despesa', err);
-                            alert('Erro ao excluir despesa');
-                          }
-                        }}
-                      ><FaTrash /></button>
-                    </div>
-                  </li>
+                  </details>
                 ))}
-              </ul>
-            )}
-          </div>
-        </details>
+              </div>
+            );
+          })()
+        )}
       </div>
     </main>
   );

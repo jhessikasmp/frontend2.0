@@ -97,21 +97,21 @@ const Emergencia: React.FC = () => {
 													if (!userId || !entradaValor) return;
 													const valor = Number(entradaValor);
 													if (valor <= 0) return;
-													const { addEmergencyEntry } = await import('../services/addEmergencyEntry');
-													await addEmergencyEntry(userId, valor);
+														const { addEmergencyEntry } = await import('../services/addEmergencyEntry');
+														await addEmergencyEntry(userId, valor);
 													setEntradaValor('');
-													// Atualiza: anual, total global e despesas; saldo é derivado via useEffect
-													const currentYear = new Date().getFullYear();
-													getEmergencyEntriesYear('', currentYear).then(entries => {
-														const totalYear = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
-														setEntradasAnual(totalYear);
-													});
-													getTotalEmergencyEntries().then(total => setEntradasTotal(total));
-													getAllEmergencyExpenses().then(arr => {
-														setDespesas(arr);
-														const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
-														setTotalDespesas(total);
-													});
+														// Atualiza: anual, total global e despesas; saldo é derivado via useEffect
+														const currentYear = new Date().getFullYear();
+														getEmergencyEntriesYear('', currentYear).then(entries => {
+															const totalYear = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
+															setEntradasAnual(totalYear);
+														});
+														getTotalEmergencyEntries().then(total => setEntradasTotal(total));
+														getAllEmergencyExpenses().then(arr => {
+															setDespesas(arr);
+															const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
+															setTotalDespesas(total);
+														});
 												}}>
 													<input type="number" placeholder="Valor da Entrada (em Euro)" className="input w-full" value={entradaValor} onChange={e => setEntradaValor(e.target.value)} min={0} step={0.01} required />
 													<div className="flex gap-4 mt-2">
@@ -135,23 +135,23 @@ const Emergencia: React.FC = () => {
 								if (!nomeInput || valorInput <= 0 || !dataInput) return;
 								const { addEmergencyExpense } = await import('../services/addEmergencyExpense');
 								await addEmergencyExpense(userId, nomeInput, valorInput, dataInput);
-								// Atualiza os cards após adicionar (global)
-								const year = new Date().getFullYear();
-								const entries = await getEmergencyEntriesYear('', year);
-								const totalYear = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
-								setEntradasAnual(totalYear);
-								const arr = await getAllEmergencyExpenses();
-								setDespesas(arr);
-								const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
-								setTotalDespesas(total);
-								getTotalEmergencyEntries().then(total => setEntradasTotal(total));
-								// Limpa os campos controlados
-								setDespesaNome('');
-								setDespesaValor('');
-								setDespesaData('');
-								// Atualiza histórico de despesas
-								import('../services/getEmergencyExpenses').then(({ getEmergencyExpenses }) => {
-									getEmergencyExpenses(userId).then(arr => setDespesas(arr));
+											// Atualiza os cards após adicionar (global)
+											const year = new Date().getFullYear();
+											const entries = await getEmergencyEntriesYear('', year);
+											const totalYear = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
+											setEntradasAnual(totalYear);
+											const arr = await getAllEmergencyExpenses();
+											setDespesas(arr);
+											const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
+											setTotalDespesas(total);
+											getTotalEmergencyEntries().then(total => setEntradasTotal(total));
+											// Limpa os campos controlados
+											setDespesaNome('');
+											setDespesaValor('');
+											setDespesaData('');
+											// Atualiza histórico de despesas (global)
+											import('../services/emergencyExpenseService').then(({ getAllEmergencyExpenses }) => {
+												getAllEmergencyExpenses().then(arr => setDespesas(arr));
 								});
 							}}>
 								<input type="text" placeholder="Nome da Despesa" className="input w-full" value={despesaNome} onChange={e => setDespesaNome(e.target.value)} required />
