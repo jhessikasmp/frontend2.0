@@ -1,3 +1,6 @@
+import ViagemEntry from '../models/ViagemEntry';
+import { Request, Response } from 'express';
+
 // Busca todas as entradas do ano (global, sem userId)
 export const getAllViagemEntriesYear = async (req: Request, res: Response) => {
   try {
@@ -10,8 +13,6 @@ export const getAllViagemEntriesYear = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: 'Erro ao buscar entradas globais do ano', error: err });
   }
 };
-import ViagemEntry from '../models/ViagemEntry';
-import { Request, Response } from 'express';
 
 // Soma total de todas as entradas de viagem (global, todo o período)
 export const getTotalViagemEntries = async (req: Request, res: Response) => {
@@ -58,14 +59,3 @@ export const getViagemEntriesYear = async (req: Request, res: Response) => {
   }
 };
 
-export const getTotalViagemEntries = async (req: Request, res: Response) => {
-  try {
-    const result = await ViagemEntry.aggregate([
-      { $group: { _id: null, total: { $sum: '$valor' } } }
-    ]);
-    const total = result[0]?.total || 0;
-    res.json({ success: true, data: { total } });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Erro ao calcular total de entradas', error: err });
-  }
-};
