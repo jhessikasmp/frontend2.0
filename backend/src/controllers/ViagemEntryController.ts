@@ -59,6 +59,3 @@ export const getViagemEntriesYear = async (req: Request, res: Response) => {
   }
 };
 
-
-
-
