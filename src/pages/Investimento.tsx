@@ -90,6 +90,62 @@ const Investimento: React.FC = () => {
 		atualizarDados();
 		getAllInvestments().then(investments => setAtivos(investments));
 	};
+<<<<<<< HEAD
+=======
+		const handleAddAtivo = async (e: React.FormEvent) => {
+			e.preventDefault();
+			if (!userId || !ativoNome || !ativoValor || !ativoTipo || !ativoMoeda || !ativoData) return;
+			await addInvestment({
+				user: userId,
+				nome: ativoNome,
+				valor: Number(ativoValor),
+				tipo: ativoTipo,
+				moeda: ativoMoeda,
+				data: ativoData
+			});
+			setAtivoNome('');
+			setAtivoValor('');
+			setAtivoTipo('');
+			setAtivoMoeda('');
+			setAtivoData('');
+			atualizarDados();
+	// Atualiza histórico de investimentos
+	getAllInvestments().then(investments => setAtivos(investments));
+		};
+			return (
+				<main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
+					<h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Investimentos</h1>
+							<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+								<div className={`${cardBase} ${cardGradients[0]}`}> 
+									<div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
+										<FaEuroSign className="text-2xl md:text-3xl opacity-80" />
+										<span className="text-base md:text-lg font-semibold">Entradas Anual</span>
+									</div>
+									  <span className="text-lg md:text-xl font-semibold block mb-1">Ano atual: {!showValues ? '•••' : entradasAnoEuro.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
+									  <span className="text-lg md:text-xl font-semibold block">Total global: {!showValues ? '•••' : entradasTotal.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
+								</div>
+																<div className={`${cardBase} ${cardGradients[1]}`}> 
+									<div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
+										<FaPiggyBank className="text-2xl md:text-3xl opacity-80" />
+										<span className="text-base md:text-lg font-semibold">Total de Ativos</span>
+									</div>
+																			<span className="text-2xl md:text-3xl font-bold">{!showValues ? '•••' : totalAtivosEuro.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
+																			{showValues && totalAtivosEuro > 0 && (
+																				<div className="flex items-center gap-4 text-xs mt-1 md:mt-2 text-white/80">
+																					<span>EUR: {totalAtivosEuro.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
+																					<span>BRL: {totalAtivosBRL.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+																				</div>
+																			)}
+								</div>
+								<div className={`${cardBase} ${cardGradients[2]}`}> 
+									<div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
+										<FaChartLine className="text-2xl md:text-3xl opacity-80" />
+										<span className="text-base md:text-lg font-semibold">{(entradasTotal - totalAtivosEuro) < 0 ? 'Lucro' : 'Prejuízo'}</span>
+									</div>
+									  <span className="text-2xl md:text-3xl font-bold text-yellow-800 dark:text-yellow-200">{!showValues ? '•••' : Math.abs(entradasTotal - totalAtivosEuro).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
+								</div>
+							</div>
+>>>>>>> 89f965dc1d858f73008bcbc0a1e13faa8c23405a
 
 	return (
 		<main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
