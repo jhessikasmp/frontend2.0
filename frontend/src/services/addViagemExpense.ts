@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from './api';
 
 export async function addViagemExpense(userId: string, nome: string, valor: number, data: string) {
   const expense = {
@@ -7,6 +7,6 @@ export async function addViagemExpense(userId: string, nome: string, valor: numb
     data,
     user: userId
   };
-  const res = await axios.post('/api/viagem-expense', expense);
+  const res = await api.post('/api/viagem-expense', expense);
   return res.data;
 }

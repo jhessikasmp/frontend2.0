@@ -1,7 +1,6 @@
-import axios from 'axios';
+import api from './api';
 
 export async function getTotalViagemEntries() {
-  const apiUrl = import.meta.env.VITE_API_URL;
-  const res = await axios.get(`${apiUrl}/api/viagem-entry/total`);
+  const res = await api.get('/api/viagem-entry/total');
   return res.data?.data?.total || 0;
 }

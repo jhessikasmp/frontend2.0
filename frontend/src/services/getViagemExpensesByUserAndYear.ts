@@ -1,7 +1,6 @@
-import axios from 'axios';
+import api from './api';
 
 export async function getViagemExpensesByUserAndYear(userId: string, year: number) {
-  const apiUrl = import.meta.env.VITE_API_URL;
-  const res = await axios.get(`${apiUrl}/api/viagem-expense/year/${userId}/${year}`);
+  const res = await api.get(`/api/viagem-expense/year/${userId}/${year}`);
   return res.data.data || [];
 }

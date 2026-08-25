@@ -1,7 +1,6 @@
-import axios from 'axios';
+import api from './api';
 
 export async function getAllViagemExpenses() {
-  const apiUrl = import.meta.env.VITE_API_URL;
-  const res = await axios.get(`${apiUrl}/api/viagem-expense/all`);
+  const res = await api.get('/api/viagem-expense/all');
   return res.data.data || [];
 }

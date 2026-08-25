@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from './api';
 
 export async function addViagemEntry(userId: string, valor: number) {
   const entry = {
@@ -7,6 +7,6 @@ export async function addViagemEntry(userId: string, valor: number) {
     data: new Date(),
     user: userId
   };
-  const res = await axios.post('/api/viagem-entry', entry);
+  const res = await api.post('/api/viagem-entry', entry);
   return res.data;
 }
