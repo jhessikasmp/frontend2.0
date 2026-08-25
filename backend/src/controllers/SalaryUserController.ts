@@ -1,0 +1,86 @@
+import { Request, Response } from 'express';
+import Salary from '../models/Salary';
+
+// Busca todos os salários do usuário em um ano
+export const getUserAnnualSalary = async (req: Request, res: Response) => {
+  try {
+    const { userId, year } = req.params;
+    const firstDay = new Date(Number(year), 0, 1);
+    const lastDay = new Date(Number(year), 11, 31, 23, 59, 59, 999);
+    const salaries = await Salary.find({
+      user: userId,
+      date: { $gte: firstDay, $lte: lastDay }
+    });
+    res.json({ success: true, data: salaries });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erro ao buscar salários anuais', error });
+  }
+};
+
+// Adiciona ou atualiza salário do mês para o usuário
+export const upsertSalary = async (req: Request, res: Response) => {
+  try {
+    const { user, value, date } = req.body;
+    if (!user || !date) {
+      res.status(400).json({ success: false, message: 'Dados inválidos' });
+      return;
+    }
+    // Garante que o valor seja número positivo
+    let parsedValue = Number(value);
+    if (isNaN(parsedValue) || parsedValue <= 0) {
+      res.status(400).json({ success: false, message: 'Valor de salário inválido' });
+      return;
+    }
+    const salaryDate = new Date(date);
+    const firstDay = new Date(salaryDate.getFullYear(), salaryDate.getMonth(), 1);
+    const lastDay = new Date(salaryDate.getFullYear(), salaryDate.getMonth() + 1, 0, 23, 59, 59, 999);
+
+    // Verifica se já existe salário para o mês, se sim, atualiza o valor
+    const existingSalary = await Salary.findOne({
+      user,
+      date: { $gte: firstDay, $lte: lastDay }
+    });
+    if (existingSalary) {
+      existingSalary.value = parsedValue;
+      existingSalary.date = salaryDate;
+      await existingSalary.save();
+      return res.json({ success: true, data: existingSalary, message: 'Salário atualizado com sucesso.' });
+    }
+
+    // Cria novo salário se não existir
+    const salary = await Salary.create({ user, value: parsedValue, date: salaryDate });
+    return res.json({ success: true, data: salary, message: 'Salário criado com sucesso.' });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Erro ao salvar salário', error });
+  }
+};
+
+// Busca salário do mês atual do usuário
+export const getUserCurrentMonthSalary = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+    const salary = await Salary.findOne({
+      user: userId,
+      date: { $gte: firstDay, $lte: lastDay }
+    });
+    res.json({ success: true, data: salary });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erro ao buscar salário', error });
+  }
+};
+
+// DELETE /api/salary/user/:id - remove a salary document by id
+export const deleteSalaryById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ success: false, message: 'ID necessário' });
+    const deleted = await Salary.findByIdAndDelete(id);
+    if (!deleted) return res.status(404).json({ success: false, message: 'Salário não encontrado' });
+    return res.json({ success: true });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Erro ao deletar salário', error });
+  }
+};

@@ -1,0 +1,13 @@
+node_modules/
+.env
+dist/
+*.log
+npm-debug.log*
+.DS_Store
+.idea/
+.vscode/
+coverage/
+build/
+credentials.json
+token.json
+generateToken.js

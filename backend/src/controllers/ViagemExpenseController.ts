@@ -1,0 +1,119 @@
+import ViagemExpense from '../models/ViagemExpense';
+import { Request, Response } from 'express';
+import mongoose from 'mongoose';
+
+export const addViagemExpense = async (req: Request, res: Response) => {
+  try {
+    const { nome, descricao, valor, data, user } = req.body;
+    const expense = await ViagemExpense.create({ nome, descricao, valor, data, user });
+    res.json({ success: true, data: expense });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Erro ao adicionar despesa', error: err });
+  }
+};
+
+export const getViagemExpenses = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const expenses = await ViagemExpense.find({ user: userId }).sort({ data: -1 });
+    return res.json({ success: true, data: expenses });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Erro ao buscar despesas', error: err });
+  }
+};
+
+export const getViagemExpensesTotal = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const expenses = await ViagemExpense.find({ user: userId });
+    const total = expenses.reduce((sum, exp) => sum + (exp.valor || 0), 0);
+    res.json({ success: true, total });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Erro ao calcular total de despesas', error: err });
+  }
+};
+
+export const getViagemExpensesGrouped = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const grouped = await ViagemExpense.aggregate([
+      { $match: { user: new mongoose.Types.ObjectId(userId) } },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$data" },
+            month: { $month: "$data" }
+          },
+          expenses: { $push: "$$ROOT" },
+          total: { $sum: "$valor" }
+        }
+      },
+      { $sort: { "_id.year": -1, "_id.month": -1 } }
+    ]);
+    res.json({ success: true, data: grouped });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Erro ao agrupar despesas', error: err });
+  }
+};
+
+// Busca todas as despesas de viagem (global, sem userId)
+export const getAllViagemExpenses = async (req: Request, res: Response) => {
+  try {
+    const expenses = await ViagemExpense.find({}).sort({ data: -1 });
+    return res.json({ success: true, data: expenses });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Erro ao buscar despesas globais', error: err });
+  }
+};
+
+// Busca despesas de viagem por ano (global, sem userId)
+export const getViagemExpensesByYear = async (req: Request, res: Response) => {
+  try {
+    const { year } = req.params;
+    const yearNum = parseInt(year, 10);
+    if (isNaN(yearNum)) {
+      return res.status(400).json({ success: false, message: 'Ano inválido' });
+    }
+    const startDate = new Date(`${yearNum}-01-01T00:00:00.000Z`);
+    const endDate = new Date(`${yearNum + 1}-01-01T00:00:00.000Z`);
+    const expenses = await ViagemExpense.find({
+      data: { $gte: startDate, $lt: endDate }
+    }).sort({ data: -1 });
+    return res.json({ success: true, data: expenses });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Erro ao buscar despesas por ano', error: err });
+  }
+};
+
+// Busca despesas de viagem por ano e por userId
+export const getViagemExpensesByUserAndYear = async (req: Request, res: Response) => {
+  try {
+    const { userId, year } = req.params;
+    const yearNum = parseInt(year, 10);
+    if (isNaN(yearNum)) {
+      return res.status(400).json({ success: false, message: 'Ano inválido' });
+    }
+    const startDate = new Date(`${yearNum}-01-01T00:00:00.000Z`);
+    const endDate = new Date(`${yearNum + 1}-01-01T00:00:00.000Z`);
+    const expenses = await ViagemExpense.find({
+      user: userId,
+      data: { $gte: startDate, $lt: endDate }
+    }).sort({ data: -1 });
+    return res.json({ success: true, data: expenses });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Erro ao buscar despesas por ano e usuário', error: err });
+  }
+};
+
+// DELETE /api/viagem-expense/:id - Remove uma despesa de viagem pelo id
+export const deleteViagemExpense = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ success: false, message: 'ID é obrigatório' });
+    const removed = await ViagemExpense.findByIdAndDelete(id);
+    if (!removed) return res.status(404).json({ success: false, message: 'Despesa não encontrada' });
+    return res.json({ success: true, message: 'Despesa removida', data: removed });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Erro ao remover despesa', error: err });
+  }
+};
