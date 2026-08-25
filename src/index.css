@@ -56,3 +56,49 @@
     display: none;
   }
 }
+
+/* Mobile: cards menores */
+@media (max-width: 640px) {
+  .card, div[class*="rounded-2xl"] {
+    @apply p-3 !important;
+  }
+  h1 {
+    @apply text-xl !important;
+  }
+  h2 {
+    @apply text-lg !important;
+  }
+  h3 {
+    @apply text-base !important;
+  }
+  button, .btn-primary, .btn-secondary {
+    @apply text-sm py-1.5 px-3 !important;
+  }
+  input, select, textarea {
+    @apply text-sm py-1.5 px-2 !important;
+  }
+  .text-2xl {
+    @apply text-lg !important;
+  }
+  .text-3xl {
+    @apply text-xl !important;
+  }
+  .gap-4 {
+    @apply gap-2 !important;
+  }
+  .gap-6 {
+    @apply gap-3 !important;
+  }
+  .p-6 {
+    @apply p-3 !important;
+  }
+  .p-5 {
+    @apply p-2.5 !important;
+  }
+  .px-5 {
+    @apply px-3 !important;
+  }
+  .py-3 {
+    @apply py-2 !important;
+  }
+}

@@ -6,7 +6,6 @@ import Despesas from './pages/Despesas';
 import Investimento from './pages/Investimento';
 import Emergencia from './pages/Emergencia';
 import Viagens from './pages/Viagens';
-import Carro from './pages/Carro';
 import RelatorioAnual from './pages/RelatorioAnual';
 
 
@@ -27,7 +26,6 @@ function App() {
               <Route path="investimento" element={<Investimento />} />
               <Route path="emergencia" element={<Emergencia />} />
               <Route path="viagens" element={<Viagens />} />
-              <Route path="carro" element={<Carro />} />
               <Route path="relatorio-anual" element={<RelatorioAnual />} />
             </Route>
             <Route path="/" element={<Navigate to="/login" replace />} />
