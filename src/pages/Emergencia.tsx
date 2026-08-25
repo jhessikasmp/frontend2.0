@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import { useValueVisibility } from '../context/ValueVisibilityContext';
 import { FaMoneyBillWave, FaWallet, FaPiggyBank, FaTrash, FaPlusCircle, FaCalendarAlt } from 'react-icons/fa';
 import { getEmergencyEntriesYear } from '../services/emergencyEntryService';
@@ -65,7 +66,6 @@ const Emergencia: React.FC = () => {
 	};
 
 	return (
-<<<<<<< HEAD
 		<main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
 			{/* Cabeçalho melhorado */}
 			<div className="bg-gradient-to-br from-red-600 via-red-700 to-pink-800 dark:from-red-900 dark:via-pink-900 dark:to-red-950 p-6 rounded-2xl text-white shadow-xl border border-red-400/20">
@@ -76,169 +76,6 @@ const Emergencia: React.FC = () => {
 							Fundo de Emergência
 						</h1>
 						<p className="text-red-100 mt-1 opacity-80">Reserva financeira para imprevistos</p>
-=======
-			<main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
-				<h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Fundo de Emergência</h1>
-							<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-								<div className="bg-gradient-to-r from-blue-500 to-blue-600 p-2 md:p-4 rounded-lg text-white shadow-lg flex flex-col justify-between min-h-[40px] md:min-h-[80px]">
-									<div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
-										<FaMoneyBillWave className="text-2xl md:text-3xl opacity-80" />
-										<span className="text-base md:text-lg font-semibold">Entradas Anual</span>
-									</div>
-									  <span className="text-lg md:text-xl font-semibold block mb-1">Ano atual: {!showValues ? '•••' : entradasAnual.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
-									  <span className="text-lg md:text-xl font-semibold block">Total global: {!showValues ? '•••' : entradasTotal.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</span>
-								</div>
-								<div className="bg-gradient-to-r from-red-500 to-red-600 p-2 md:p-4 rounded-lg text-white shadow-lg flex flex-col justify-between min-h-[40px] md:min-h-[80px]">
-									<div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
-										<FaWallet className="text-2xl md:text-3xl opacity-80" />
-										<span className="text-base md:text-lg font-semibold">Total de Despesas</span>
-									</div>
-									  <span className="text-2xl md:text-3xl font-bold">{!showValues ? '•••' : `€ ${totalDespesas.toLocaleString('de-DE', { minimumFractionDigits: 2 })}`}</span>
-								</div>
-								<div className="bg-gradient-to-r from-green-500 to-green-600 p-2 md:p-4 rounded-lg text-white shadow-lg flex flex-col justify-between min-h-[40px] md:min-h-[80px]">
-									<div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
-										<FaPiggyBank className="text-2xl md:text-3xl opacity-80" />
-										<span className="text-base md:text-lg font-semibold">Saldo do Fundo</span>
-									</div>
-									  <span className="text-2xl md:text-3xl font-bold">{!showValues ? '•••' : `€ ${saldoFundo.toLocaleString('de-DE', { minimumFractionDigits: 2 })}`}</span>
-								</div>
-							</div>
-
-									{/* Adicionar Entrada (Aporte) com botão cinza #9da4b0 */}
-									<div className="card mb-8 w-full rounded-lg shadow-lg p-4 sm:p-6">
-										{!showEntradaForm ? (
-											<button
-												className="w-full h-12 rounded-xl text-base font-semibold text-white border border-zinc-300 dark:border-zinc-700 transition"
-												style={{ backgroundColor: '#9da4b0' }}
-												onClick={() => setShowEntradaForm(true)}
-											>Adicionar Entrada (Aporte)</button>
-										) : (
-											<>
-												<h2 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">Adicionar Entrada (Aporte)</h2>
-												<form className="grid grid-cols-1 gap-4" onSubmit={async e => {
-													e.preventDefault();
-													if (!userId || !entradaValor) return;
-													const valor = Number(entradaValor);
-													if (valor <= 0) return;
-														const { addEmergencyEntry } = await import('../services/addEmergencyEntry');
-														await addEmergencyEntry(userId, valor);
-													setEntradaValor('');
-														// Atualiza: anual, total global e despesas; saldo é derivado via useEffect
-														const currentYear = new Date().getFullYear();
-														getEmergencyEntriesYear('', currentYear).then(entries => {
-															const totalYear = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
-															setEntradasAnual(totalYear);
-														});
-														getTotalEmergencyEntries().then(total => setEntradasTotal(total));
-														getAllEmergencyExpenses().then(arr => {
-															setDespesas(arr);
-															const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
-															setTotalDespesas(total);
-														});
-												}}>
-													<input type="number" placeholder="Valor da Entrada (em Euro)" className="input w-full" value={entradaValor} onChange={e => setEntradaValor(e.target.value)} min={0} step={0.01} required />
-													<div className="flex gap-4 mt-2">
-														<button type="submit" className="btn-primary flex-1 h-12 rounded-xl text-base">Adicionar Entrada</button>
-														<button type="button" className="btn-secondary flex-1 h-12 rounded-xl text-base" onClick={() => setShowEntradaForm(false)}>Cancelar</button>
-													</div>
-												</form>
-											</>
-										)}
-									</div>
-
-				{/* Adicionar Despesa */}
-				<div className="card mb-8 w-full rounded-lg shadow-lg p-4 sm:p-6">
-					<h2 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">Adicionar Despesa</h2>
-							<form className="grid grid-cols-1 gap-4" onSubmit={async e => {
-								e.preventDefault();
-								if (!userId) return;
-								const nomeInput = despesaNome;
-								const valorInput = Number(despesaValor);
-								const dataInput = despesaData;
-								if (!nomeInput || valorInput <= 0 || !dataInput) return;
-								const { addEmergencyExpense } = await import('../services/addEmergencyExpense');
-								await addEmergencyExpense(userId, nomeInput, valorInput, dataInput);
-											// Atualiza os cards após adicionar (global)
-											const year = new Date().getFullYear();
-											const entries = await getEmergencyEntriesYear('', year);
-											const totalYear = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
-											setEntradasAnual(totalYear);
-											const arr = await getAllEmergencyExpenses();
-											setDespesas(arr);
-											const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
-											setTotalDespesas(total);
-											getTotalEmergencyEntries().then(total => setEntradasTotal(total));
-											// Limpa os campos controlados
-											setDespesaNome('');
-											setDespesaValor('');
-											setDespesaData('');
-											// Atualiza histórico de despesas (global)
-											import('../services/emergencyExpenseService').then(({ getAllEmergencyExpenses }) => {
-												getAllEmergencyExpenses().then(arr => setDespesas(arr));
-								});
-							}}>
-								<input type="text" placeholder="Nome da Despesa" className="input w-full" value={despesaNome} onChange={e => setDespesaNome(e.target.value)} required />
-								<input type="number" placeholder="Valor (em Euro)" className="input w-full" min={0} step={0.01} value={despesaValor} onChange={e => setDespesaValor(e.target.value)} required />
-								<input type="date" className="input w-full" value={despesaData} onChange={e => setDespesaData(e.target.value)} required />
-								<button type="submit" className="btn-primary mt-2 w-full h-14 rounded-xl text-base">Adicionar Despesa</button>
-							</form>
-				</div>
-					{/* Histórico de Despesas - acordeon */}
-					<div className="w-full mt-10 px-2 sm:px-0">
-								<details className="rounded-lg shadow-sm" open>
-									<summary className="cursor-pointer px-2 sm:px-4 py-3 font-semibold text-base sm:text-lg select-none flex items-center justify-between">
-										<span className="flex items-center gap-2">
-											Histórico de Despesas
-											<svg className="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-										</span>
-										<span className="text-xs text-zinc-400">{despesas.length} despesas</span>
-									</summary>
-									<div className="px-2 sm:px-4 pb-4">
-										{despesas.length === 0 ? (
-											<div className="text-zinc-500 italic">Nenhuma despesa cadastrada.</div>
-										) : (
-											<ul className="divide-y divide-zinc-200 dark:divide-zinc-700">
-												{despesas.map((d, i) => (
-													<li key={d._id || i} className="py-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-sm sm:text-base">
-														<div className="flex items-center gap-3">
-															<span className="font-medium text-gray-900 dark:text-white">{d.nome}</span>
-															<span className="text-xs text-zinc-400">{new Date(d.data).toLocaleDateString('pt-BR')}</span>
-														</div>
-														<div className="flex items-center gap-3">
-															<span className="text-sm text-red-600">€ {d.valor.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</span>
-															<button
-																className="text-zinc-500 hover:text-red-600 p-1"
-																title="Excluir despesa"
-																onClick={async () => {
-																	if (!d._id) return;
-																	if (!confirm('Confirma exclusão desta despesa?')) return;
-																	const { deleteEmergencyExpense } = await import('../services/deleteEmergencyExpense');
-																	try {
-																		await deleteEmergencyExpense(d._id);
-																		// Atualiza histórico e totais
-																		getAllEmergencyExpenses().then(arr => {
-																			setDespesas(arr);
-																			const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
-																			setTotalDespesas(total);
-																		});
-																		const year = new Date().getFullYear();
-																		getEmergencyEntriesYear('', year).then(entries => {
-																			const totalYear = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
-																			setEntradasAnual(totalYear);
-																		});
-																	} catch (err) {
-																		console.error('Erro ao excluir despesa', err);
-																		alert('Erro ao excluir despesa');
-																	}
-																}}
-															><FaTrash /></button>
-														</div>
-													</li>
-												))}
-											</ul>
-										)}
-									</div>
-								</details>
 					</div>
 				</div>
 			</div>

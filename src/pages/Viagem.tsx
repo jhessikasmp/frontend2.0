@@ -58,13 +58,8 @@ const Viagem: React.FC = () => {
   }, []);
 
   useEffect(() => {
-<<<<<<< HEAD
     setSaldoFundo((entradasAnual || 0) - (totalDespesasAno || 0));
   }, [entradasAnual, totalDespesasAno]);
-=======
-    setSaldoFundo((entradasTotal || 0) - (totalDespesas || 0));
-  }, [entradasTotal, totalDespesas]);
->>>>>>> 89f965dc1d858f73008bcbc0a1e13faa8c23405a
 
   return (
     <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
@@ -135,24 +130,7 @@ const Viagem: React.FC = () => {
               const { addViagemEntry } = await import('../services/addViagemEntry');
               await addViagemEntry(userId, valor);
               setEntradaValor('');
-<<<<<<< HEAD
               await atualizarTudo();
-=======
-              // Atualiza os cards após adicionar (global)
-              const year = new Date().getFullYear();
-              getViagemEntriesYear('', year).then((entries: any[]) => {
-                const total = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
-                setEntradasAnual(total);
-              });
-              getTotalViagemEntries().then(total => {
-                setEntradasTotal(total);
-              });
-              getAllViagemExpenses().then((arr: any[]) => {
-                setDespesas(arr);
-                const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
-                setTotalDespesas(total);
-              });
->>>>>>> 89f965dc1d858f73008bcbc0a1e13faa8c23405a
             }}>
               <input type="number" placeholder="Valor da Entrada (em Euro)" className="input w-full rounded-xl" value={entradaValor} onChange={e => setEntradaValor(e.target.value)} min={0} step={0.01} required />
               <div className="flex gap-4">
@@ -203,63 +181,9 @@ const Viagem: React.FC = () => {
         )}
       </div>
 
-<<<<<<< HEAD
-      {/* Histórico de Despesas - Acordeão */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <button
-          className="w-full flex items-center justify-between p-5 bg-gradient-to-r from-gray-500 to-slate-600 dark:from-gray-700 dark:to-slate-800 text-white font-bold text-lg hover:from-gray-600 hover:to-slate-700 transition-all"
-          onClick={() => setShowHistorico(v => !v)}
-        >
-          <span className="flex items-center gap-3">
-            <FaCalendarAlt className="text-xl" />
-            Histórico de Despesas
-          </span>
-          <span className="flex items-center gap-3">
-            <span className="bg-white/20 text-white px-3 py-0.5 rounded-full text-sm">{despesas.length}</span>
-            <span className="text-xl">{showHistorico ? '▲' : '▼'}</span>
-          </span>
-        </button>
-        {showHistorico && (
-          <div className="p-6">
-            {despesas.length === 0 ? (
-              <div className="text-zinc-500 italic text-center py-8">Nenhuma despesa cadastrada.</div>
-            ) : (
-              <div className="space-y-3">
-                {despesas.map((d, i) => (
-                  <div key={d._id || i} className="bg-gradient-to-r from-gray-50 to-sky-50 dark:from-gray-700 dark:to-gray-750 rounded-xl p-4 flex justify-between items-center shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
-                    <div className="flex-1">
-                      <div className="font-semibold text-gray-900 dark:text-white">{d.nome}</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{new Date(d.data).toLocaleDateString('pt-BR')}</div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="font-bold text-red-600 dark:text-red-400">
-                        {!showValues ? '•••' : `€ ${d.valor.toLocaleString('de-DE', { minimumFractionDigits: 2 })}`}
-                      </span>
-                      <button
-                        className="text-zinc-400 hover:text-red-600 p-2 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all"
-                        title="Excluir despesa"
-                        onClick={async () => {
-                          if (!d._id) return;
-                          if (!confirm('Confirma exclusão desta despesa?')) return;
-                          const { deleteViagemExpense } = await import('../services/deleteViagemExpense');
-                          try {
-                            await deleteViagemExpense(d._id);
-                            await atualizarTudo();
-                          } catch (err) {
-                            console.error('Erro ao excluir despesa', err);
-                            alert('Erro ao excluir despesa');
-                          }
-                        }}
-                      ><FaTrash /></button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-=======
-      {/* Histórico de Despesas por Ano - acordeon */}
+      {/* Histórico de Despesas - Acordeão por Ano */}
       <div className="w-full mt-10 px-2 sm:px-0">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Histórico de Despesas</h2>
         {despesas.length === 0 ? (
           <div className="rounded-lg shadow-sm p-4 text-zinc-500 italic">Nenhuma despesa cadastrada.</div>
         ) : (
@@ -275,8 +199,8 @@ const Viagem: React.FC = () => {
             return (
               <div className="space-y-3">
                 {anos.map((ano) => (
-                  <details key={ano} className="rounded-lg shadow-sm" open={ano === anoAtual}>
-                    <summary className="cursor-pointer px-2 sm:px-4 py-3 font-semibold text-base sm:text-lg select-none flex items-center justify-between">
+                  <details key={ano} className="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800" open={ano === anoAtual}>
+                    <summary className="cursor-pointer px-2 sm:px-4 py-3 font-semibold text-base sm:text-lg select-none flex items-center justify-between bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                       <span className="flex items-center gap-2">
                         Despesas {ano}
                         <svg className="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
@@ -305,17 +229,7 @@ const Viagem: React.FC = () => {
                                     const { deleteViagemExpense } = await import('../services/deleteViagemExpense');
                                     try {
                                       await deleteViagemExpense(d._id);
-                                      // Atualiza histórico e totais
-                                      getAllViagemExpenses().then((arr: any[]) => {
-                                        setDespesas(arr);
-                                        const total = arr.reduce((sum: number, exp: any) => sum + (exp.valor || 0), 0);
-                                        setTotalDespesas(total);
-                                      });
-                                      const year = new Date().getFullYear();
-                                      getViagemEntriesYear('', year).then((entries: any[]) => {
-                                        const total = entries.reduce((sum: number, e: any) => sum + (e.valor || 0), 0);
-                                        setEntradasAnual(total);
-                                      });
+                                      await atualizarTudo();
                                     } catch (err) {
                                       console.error('Erro ao excluir despesa', err);
                                       alert('Erro ao excluir despesa');
@@ -332,7 +246,6 @@ const Viagem: React.FC = () => {
               </div>
             );
           })()
->>>>>>> 89f965dc1d858f73008bcbc0a1e13faa8c23405a
         )}
       </div>
     </main>
