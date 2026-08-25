@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useValueVisibility } from '../context/ValueVisibilityContext';
-import { FaMoneyBillWave, FaWallet, FaPiggyBank, FaTrash, FaPlusCircle, FaCalendarAlt, FaPlane } from 'react-icons/fa';
+import { FaMoneyBillWave, FaWallet, FaPiggyBank, FaTrash, FaPlusCircle, FaPlane } from 'react-icons/fa';
 import { getViagemEntriesYear } from '../services/viagemEntryService';
 import { getTotalViagemEntries } from '../services/getTotalViagemEntries';
 import { getAllViagemExpenses } from '../services/getAllViagemExpenses';
@@ -32,7 +32,6 @@ const Viagem: React.FC = () => {
   })();
   const [showEntradaForm, setShowEntradaForm] = useState(false);
   const [showDespesaForm, setShowDespesaForm] = useState(false);
-  const [showHistorico, setShowHistorico] = useState(false);
 
   const atualizarTudo = async () => {
     const year = new Date().getFullYear();

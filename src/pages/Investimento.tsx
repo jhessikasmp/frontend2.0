@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useValueVisibility } from '../context/ValueVisibilityContext';
-import { FaPiggyBank, FaEuroSign, FaChartLine, FaPercentage, FaPoundSign, FaDollarSign, FaMoneyBillWave, FaTrash } from 'react-icons/fa';
+import { FaPiggyBank, FaEuroSign, FaChartLine, FaPercentage, FaDollarSign, FaMoneyBillWave } from 'react-icons/fa';
 import { getInvestmentEntriesYear } from '../services/investmentEntryService';
 import { getTotalInvestmentEntries } from '../services/getTotalInvestmentEntries';
 import { getAllInvestments } from '../services/getAllInvestments';
 import { toEuro, toBRL, toGBP } from '../utils/currency';
 import { addInvestmentEntry } from '../services/addInvestmentEntry';
-import { addInvestment } from '../services/addInvestment';
 
 const cardBase =
 	'flex flex-col justify-between rounded-lg shadow-lg border border-white/30 hover:border-primary-400 transition-all duration-200 p-2 md:p-4 min-h-[40px] md:min-h-[48px] text-white cursor-pointer';
@@ -25,11 +24,6 @@ const Investimento: React.FC = () => {
 	const [totalAtivosGBP, setTotalAtivosGBP] = useState(0);
 	const [entradaValor, setEntradaValor] = useState('');
 	const [entradaMoeda, setEntradaMoeda] = useState('Euro');
-	const [ativoNome, setAtivoNome] = useState('');
-	const [ativoValor, setAtivoValor] = useState('');
-	const [ativoTipo, setAtivoTipo] = useState('');
-	const [ativoMoeda, setAtivoMoeda] = useState('');
-	const [ativoData, setAtivoData] = useState('');
 	const [ativos, setAtivos] = useState<any[]>([]);
 	const userId = (() => {
 		try {
@@ -88,26 +82,6 @@ const Investimento: React.FC = () => {
 		await addInvestmentEntry(userId, Number(entradaValor), entradaMoeda);
 		setEntradaValor('');
 		atualizarDados();
-	};
-
-	const handleAddAtivo = async (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!userId || !ativoNome || !ativoValor || !ativoTipo || !ativoMoeda || !ativoData) return;
-		await addInvestment({
-			user: userId,
-			nome: ativoNome,
-			valor: Number(ativoValor),
-			tipo: ativoTipo,
-			moeda: ativoMoeda,
-			data: ativoData
-		});
-		setAtivoNome('');
-		setAtivoValor('');
-		setAtivoTipo('');
-		setAtivoMoeda('');
-		setAtivoData('');
-		atualizarDados();
-		getAllInvestments().then(investments => setAtivos(investments));
 	};
 
 	return (

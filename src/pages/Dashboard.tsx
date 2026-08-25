@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 
-import { FaMoneyBillWave, FaWallet, FaPiggyBank, FaUserCircle, FaBell, FaBars, FaEye, FaEyeSlash, FaChartLine, FaCoins, FaTrash } from 'react-icons/fa';
+import { FaMoneyBillWave, FaWallet, FaPiggyBank, FaUserCircle, FaBell, FaBars, FaEye, FaEyeSlash, FaChartLine, FaCoins } from 'react-icons/fa';
 import { useValueVisibility } from '../context/ValueVisibilityContext';
 
 import { safeGetFromStorage } from '../utils/storage';
@@ -49,7 +49,6 @@ const Dashboard: React.FC = () => {
     // Fetch expenses from last 6 months
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-    const fromDate = sixMonthsAgo.toISOString().split('T')[0];
 
     const [expRes, invRes, salaryRes] = await Promise.all([
       fetch(`${apiUrl}/api/expense/user/${userId}`),
