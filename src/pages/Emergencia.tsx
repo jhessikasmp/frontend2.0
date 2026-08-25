@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from 'react';
 import { useValueVisibility } from '../context/ValueVisibilityContext';
 import { FaMoneyBillWave, FaWallet, FaPiggyBank, FaTrash, FaPlusCircle, FaCalendarAlt } from 'react-icons/fa';
 import { getEmergencyEntriesYear } from '../services/emergencyEntryService';
@@ -240,7 +239,6 @@ const Emergencia: React.FC = () => {
 										)}
 									</div>
 								</details>
->>>>>>> 89f965dc1d858f73008bcbc0a1e13faa8c23405a
 					</div>
 				</div>
 			</div>
