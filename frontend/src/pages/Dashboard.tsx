@@ -148,16 +148,15 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     if (currentUser && currentUser._id) {
-      fetchSalaryTotal(currentUser._id);
+      fetchSalaryTotal();
       fetchUserSalary(currentUser._id);
     }
   }, [currentUser]);
 
-  const fetchSalaryTotal = async (userId?: string) => {
+  const fetchSalaryTotal = async () => {
     setSalaryLoading(true);
     try {
-      const query = userId ? `?userId=${userId}` : '';
-      const res = await fetch(`${apiUrl}/api/salary/current-month-total${query}`);
+      const res = await fetch(`${apiUrl}/api/salary/current-month-total`);
       const data = await res.json();
       if (res.ok && data.success) {
         setSalaryTotal(data.total);
@@ -192,7 +191,7 @@ const Dashboard: React.FC = () => {
       const data = await res.json();
       if (res.ok && data.success) {
         const now = new Date();
-        fetchSalaryTotal(currentUser._id);
+        fetchSalaryTotal();
         fetchExpenseTotal();
         setSalaryInput('');
         setSalaryDate(now.toISOString().slice(0, 10));

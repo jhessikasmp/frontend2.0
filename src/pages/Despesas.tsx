@@ -116,7 +116,7 @@ const Despesas: React.FC = () => {
             value: Number(form.valor),
             category: form.categoria,
             description: form.descricao,
-            frequency: form.periodicidade,
+            frequency: form.periodicidade === 'mensal' ? 'monthly' : form.periodicidade === 'bimestral' ? 'bimonthly' : 'quarterly',
             startDate: form.data,
           })
         });

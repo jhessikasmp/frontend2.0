@@ -67,6 +67,7 @@ async function generateRecurringExpenses(): Promise<number> {
 /**
  * Inicia o serviço de cron para despesas recorrentes
  * Executa todo dia 1 de cada mês às 00:00
+ * Também executa imediatamente ao iniciar para gerar despesas pendentes
  */
 export function startRecurringExpenseCron(): void {
   // Cron: todo dia 1 do mês à meia-noite
@@ -85,7 +86,6 @@ export function startRecurringExpenseCron(): void {
   });
 
   // Cron: também executa a cada hora para garantir que não perca dias
-  // (útil caso o servidor reinicie no meio do mês)
   cron.schedule('0 * * * *', async () => {
     const now = new Date();
     if (now.getDate() !== 1) return; // Só executa no dia 1
@@ -100,6 +100,22 @@ export function startRecurringExpenseCron(): void {
       console.error('❌ [Cron-Hourly] Erro:', error);
     }
   });
+
+  // Gera imediatamente ao iniciar o servidor para processar despesas pendentes
+  // (útil quando o servidor reinicia a meio do mês ou após adicionar nova recorrência)
+  setTimeout(async () => {
+    console.log('🚀 [Startup] Verificando despesas recorrentes pendentes...');
+    try {
+      const generated = await generateRecurringExpenses();
+      if (generated > 0) {
+        console.log(`✅ [Startup] ${generated} despesas recorrentes geradas na inicialização`);
+      } else {
+        console.log('ℹ️ [Startup] Nenhuma despesa recorrente pendente para gerar');
+      }
+    } catch (error) {
+      console.error('❌ [Startup] Erro ao gerar despesas recorrentes:', error);
+    }
+  }, 3000); // Aguarda 3 segundos para garantir que a DB está conectada
 
   console.log('📅 Serviço de despesas recorrentes iniciado');
 }

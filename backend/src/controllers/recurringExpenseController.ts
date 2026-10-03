@@ -7,6 +7,41 @@ export const createRecurringExpense = async (req: Request, res: Response) => {
     const { user, name, value, category, description, frequency, startDate } = req.body;
     const recurring = new RecurringExpense({ user, name, value, category, description, frequency, startDate });
     await recurring.save();
+
+    // Gera a despesa real imediatamente se a data de início for o mês atual ou anterior
+    const now = new Date();
+    const start = new Date(startDate);
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    const monthsSinceStart = (currentYear - start.getFullYear()) * 12 + (currentMonth - start.getMonth());
+
+    let shouldGenerate = false;
+    switch (frequency) {
+      case 'monthly':
+        shouldGenerate = monthsSinceStart >= 0;
+        break;
+      case 'bimonthly':
+        shouldGenerate = monthsSinceStart >= 0 && monthsSinceStart % 2 === 0;
+        break;
+      case 'quarterly':
+        shouldGenerate = monthsSinceStart >= 0 && monthsSinceStart % 3 === 0;
+        break;
+    }
+
+    if (shouldGenerate) {
+      const expense = new Expense({
+        user,
+        name: `${name} (Recorrente)`,
+        value,
+        category,
+        description: description || `Gerado automaticamente - ${frequency}`,
+        date: now,
+      });
+      await expense.save();
+      recurring.lastGenerated = now;
+      await recurring.save();
+    }
+
     return res.status(201).json({ success: true, data: recurring });
   } catch (error: any) {
     return res.status(500).json({ success: false, message: error.message });

@@ -5,6 +5,7 @@ import { addViagemEntry, getViagemEntries, getViagemEntriesYear, getAllViagemEnt
 const router = Router();
 
 router.post('/', addViagemEntry);
+router.get('/total', getTotalViagemEntries);
 router.get('/user/:userId', getViagemEntries);
 router.get('/year/:userId/:year', getViagemEntriesYear);
 // Nova rota global para entradas anuais

@@ -1,7 +1,8 @@
 import axios from 'axios';
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 export async function getViagemEntriesYear(userId: string, year: number) {
-  const apiUrl = import.meta.env.VITE_API_URL;
   let url;
   if (!userId) {
     url = `${apiUrl}/api/viagem-entry/year/${year}`;
@@ -13,6 +14,6 @@ export async function getViagemEntriesYear(userId: string, year: number) {
 }
 
 export async function addViagemEntry(entry: any) {
-  const res = await axios.post('/api/viagem-entry', entry);
+  const res = await axios.post(`${apiUrl}/api/viagem-entry`, entry);
   return res.data;
 }
